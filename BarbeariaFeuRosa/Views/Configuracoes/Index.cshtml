@@ -1,0 +1,142 @@
+﻿@model BarbeariaFeuRosa.Models.Configuracao
+
+@{
+    ViewData["Title"] = "Configurações";
+}
+
+<div class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Configurações</h2>
+
+        <a href="/Dashboard" class="btn btn-outline-dark">
+            ← Voltar ao Painel
+        </a>
+    </div>
+
+    <hr />
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Sucesso"]
+        </div>
+    }
+
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Erro"]
+        </div>
+    }
+
+    <div class="card p-4 shadow-sm">
+        <h5>Configurações da Barbearia</h5>
+
+        <form asp-action="Index" method="post" enctype="multipart/form-data">
+
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="LogoUrl" />
+            <input type="hidden" asp-for="CarrosselImagem1" />
+            <input type="hidden" asp-for="CarrosselImagem2" />
+            <input type="hidden" asp-for="CarrosselImagem3" />
+            <input type="hidden" asp-for="CarrosselImagem4" />
+            <input type="hidden" asp-for="CarrosselImagem5" />
+
+            <div class="mb-3 mt-3">
+                <label>Nome da Barbearia</label>
+                <input asp-for="NomeBarbearia" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label>Promoção em Destaque</label>
+                <input asp-for="PromocaoDestaque" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label>Foto/Logo da Barbearia</label>
+                <input type="file" name="logo" class="form-control" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.LogoUrl))
+            {
+                <div class="mb-3">
+                    <label>Logo Atual</label>
+                    <br />
+                    <img src="@Model.LogoUrl" style="max-height: 120px;" />
+                </div>
+            }
+
+            <hr />
+
+            <h5>Carrossel da Página Inicial</h5>
+            <p class="text-muted">Escolha até 5 imagens em destaque.</p>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Imagem 1</label>
+                    <input type="file" name="imagem1" class="form-control" />
+                    @if (!string.IsNullOrEmpty(Model.CarrosselImagem1))
+                    {
+                        <img src="@Model.CarrosselImagem1" class="mt-2 rounded" style="max-height: 100px;" />
+                    }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Imagem 2</label>
+                    <input type="file" name="imagem2" class="form-control" />
+                    @if (!string.IsNullOrEmpty(Model.CarrosselImagem2))
+                    {
+                        <img src="@Model.CarrosselImagem2" class="mt-2 rounded" style="max-height: 100px;" />
+                    }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Imagem 3</label>
+                    <input type="file" name="imagem3" class="form-control" />
+                    @if (!string.IsNullOrEmpty(Model.CarrosselImagem3))
+                    {
+                        <img src="@Model.CarrosselImagem3" class="mt-2 rounded" style="max-height: 100px;" />
+                    }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Imagem 4</label>
+                    <input type="file" name="imagem4" class="form-control" />
+                    @if (!string.IsNullOrEmpty(Model.CarrosselImagem4))
+                    {
+                        <img src="@Model.CarrosselImagem4" class="mt-2 rounded" style="max-height: 100px;" />
+                    }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Imagem 5</label>
+                    <input type="file" name="imagem5" class="form-control" />
+                    @if (!string.IsNullOrEmpty(Model.CarrosselImagem5))
+                    {
+                        <img src="@Model.CarrosselImagem5" class="mt-2 rounded" style="max-height: 100px;" />
+                    }
+                </div>
+            </div>
+
+            <hr />
+
+            <h5>Alterar Senha do ADM</h5>
+
+            <div class="mb-3">
+                <label>Senha Atual do ADM</label>
+                <input type="password" name="senhaAdmAtual" maxlength="6" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label>Nova Senha do ADM</label>
+                <input type="password" name="novaSenhaAdm" maxlength="6" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100">
+                Salvar Configurações
+            </button>
+
+        </form>
+    </div>
+</div>

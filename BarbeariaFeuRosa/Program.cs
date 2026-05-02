@@ -1,29 +1,125 @@
+using BarbeariaFeuRosa.Data;
+using BarbeariaFeuRosa.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(8);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    bool existeAdm = context.Usuarios.Any(x => x.UsuarioLogin == "admin");
+
+    if (!existeAdm)
+    {
+        context.Usuarios.Add(new Usuario
+        {
+            Nome = "Administrador",
+            UsuarioLogin = "admin",
+            Senha = "123456",
+            Tipo = "ADM"
+        });
+
+        context.SaveChanges();
+    }
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
+app.MapControllerRoute(
+    name: "agenda",
+    pattern: "Agenda/{action=Index}/{id?}",
+    defaults: new { controller = "Agenda" });
+
+app.MapControllerRoute(
+    name: "agendamentoOnline",
+    pattern: "AgendamentoOnline/{action=Index}/{id?}",
+    defaults: new { controller = "AgendamentoOnline" });
+
+app.MapControllerRoute(
+    name: "auth",
+    pattern: "Auth/{action=Login}/{id?}",
+    defaults: new { controller = "Auth" });
+
+app.MapControllerRoute(
+    name: "barbeiros",
+    pattern: "Barbeiros/{action=Index}/{id?}",
+    defaults: new { controller = "Barbeiros" });
+
+app.MapControllerRoute(
+    name: "clientes",
+    pattern: "Clientes/{action=Index}/{id?}",
+    defaults: new { controller = "Clientes" });
+
+app.MapControllerRoute(
+    name: "clienteHome",
+    pattern: "ClienteHome/{action=Index}/{id?}",
+    defaults: new { controller = "ClienteHome" });
+
+app.MapControllerRoute(
+    name: "configuracoes",
+    pattern: "Configuracoes/{action=Index}/{id?}",
+    defaults: new { controller = "Configuracoes" });
+
+app.MapControllerRoute(
+    name: "dashboard",
+    pattern: "Dashboard/{action=Index}/{id?}",
+    defaults: new { controller = "Dashboard" });
+
+app.MapControllerRoute(
+    name: "financeiro",
+    pattern: "Financeiro/{action=Index}/{id?}",
+    defaults: new { controller = "Financeiro" });
+
+app.MapControllerRoute(
+    name: "historicoCliente",
+    pattern: "HistoricoCliente/{action=Index}/{id?}",
+    defaults: new { controller = "HistoricoCliente" });
+
+app.MapControllerRoute(
+    name: "painelBarbeiro",
+    pattern: "PainelBarbeiro/{action=Index}/{id?}",
+    defaults: new { controller = "PainelBarbeiro" });
+
+app.MapControllerRoute(
+    name: "home",
+    pattern: "Home/{action=Index}/{id?}",
+    defaults: new { controller = "Home" });
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Auth}/{action=Login}/{id?}");
 
 app.Run();

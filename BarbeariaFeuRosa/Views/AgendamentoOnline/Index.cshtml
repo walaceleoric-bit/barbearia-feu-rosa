@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Agendar Horário";
+}
+
+<div class="container p-4" style="max-width:700px;">
+
+    <h2>Agendar Horário</h2>
+    <hr />
+
+    <form method="post">
+
+        <div class="mb-3">
+            <label>Barbeiro</label>
+            <select name="barbeiroId" asp-items="ViewBag.Barbeiros" class="form-control" required>
+                <option value="">Selecione...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Serviço</label>
+            <select name="servico" asp-items="ViewBag.Servicos" class="form-control" required>
+                <option value="">Selecione...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Data e Hora</label>
+            <input name="dataHora" type="datetime-local" class="form-control" required />
+        </div>
+
+        <button class="btn btn-dark">
+            Confirmar Agendamento
+        </button>
+
+        <a href="/ClienteHome/Index" class="btn btn-secondary">
+            Voltar
+        </a>
+
+    </form>
+
+</div>

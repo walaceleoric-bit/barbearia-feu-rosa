@@ -1,0 +1,72 @@
+﻿@model BarbeariaFeuRosa.Models.Agendamento
+
+@{
+    ViewData["Title"] = "Novo Agendamento";
+}
+
+<div class="container p-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Novo Agendamento</h2>
+
+        <a href="/Agenda" class="btn btn-outline-dark">
+            ← Voltar
+        </a>
+    </div>
+
+    <hr />
+
+    <form asp-action="Novo" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label>Cliente</label>
+            <select asp-for="ClienteId"
+                    asp-items="ViewBag.Clientes"
+                    class="form-control">
+                <option value="">Selecione...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Barbeiro</label>
+            <select asp-for="BarbeiroId"
+                    asp-items="ViewBag.Barbeiros"
+                    class="form-control">
+                <option value="">Selecione...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Serviço</label>
+            <select asp-for="Servico"
+                    asp-items="ViewBag.Servicos"
+                    class="form-control">
+                <option value="">Selecione...</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Data e Hora</label>
+            <input asp-for="DataHora"
+                   type="datetime-local"
+                   class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>Valor</label>
+            <input asp-for="Valor"
+                   class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-dark">
+            Salvar
+        </button>
+
+        <a href="/Agenda" class="btn btn-secondary">
+            Cancelar
+        </a>
+
+    </form>
+
+</div>

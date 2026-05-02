@@ -1,0 +1,68 @@
+﻿@model BarbeariaFeuRosa.Models.Barbeiro
+
+@{
+    ViewData["Title"] = "Novo Barbeiro";
+}
+
+<div class="container mt-4">
+
+    <h2>Novo Barbeiro</h2>
+
+    <hr />
+
+    <form asp-action="Novo" method="post">
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <h5>Dados do Barbeiro</h5>
+
+        <div class="mb-3">
+            <label class="form-label">Nome</label>
+            <input asp-for="Nome" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Telefone</label>
+            <input asp-for="Telefone" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Especialidade</label>
+            <input asp-for="Especialidade" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Comissão %</label>
+            <input asp-for="ComissaoPercentual" class="form-control" />
+        </div>
+
+        <div class="form-check mb-4">
+            <input asp-for="Ativo" class="form-check-input" checked />
+            <label class="form-check-label">Ativo</label>
+        </div>
+
+        <hr />
+
+        <h5>Login do Barbeiro</h5>
+
+        <div class="mb-3">
+            <label class="form-label">Usuário de Login</label>
+            <input name="usuarioLogin" class="form-control" placeholder="Ex: joao" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Senha</label>
+            <input name="senha" class="form-control" maxlength="6" placeholder="Máximo 6 caracteres" required />
+        </div>
+
+        <button type="submit" class="btn btn-dark">
+            Salvar
+        </button>
+
+        <a href="/Barbeiros" class="btn btn-secondary">
+            Cancelar
+        </a>
+
+    </form>
+
+</div>

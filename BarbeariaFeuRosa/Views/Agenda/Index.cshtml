@@ -1,0 +1,93 @@
+﻿@model List<BarbeariaFeuRosa.Models.Agendamento>
+
+@{
+    ViewData["Title"] = "Agenda";
+}
+
+<div class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Agenda</h2>
+
+        <a href="/Dashboard" class="btn btn-outline-dark">
+            ← Voltar ao Painel
+        </a>
+    </div>
+
+    <hr />
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Sucesso"]
+        </div>
+    }
+
+    <a asp-action="Novo" class="btn btn-dark mb-3">
+        + Novo Agendamento
+    </a>
+
+    <table class="table table-bordered table-hover">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Cliente</th>
+                <th>WhatsApp</th>
+                <th>Barbeiro</th>
+                <th>Serviço</th>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th width="120">Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var whatsapp = item.Cliente?.WhatsApp ?? "";
+                var whatsappLimpo = whatsapp
+                    .Replace("(", "")
+                    .Replace(")", "")
+                    .Replace("-", "")
+                    .Replace(" ", "");
+
+                <tr>
+                    <td>@item.Cliente?.Nome</td>
+
+                    <td>
+                        @if (!string.IsNullOrEmpty(whatsappLimpo))
+                        {
+                            <a href="https://wa.me/55@whatsappLimpo"
+                                   target="_blank"
+                                   class="btn btn-success btn-sm">
+                                WhatsApp
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sem WhatsApp</span>
+                        }
+                    </td>
+
+                    <td>@item.Barbeiro?.Nome</td>
+                    <td>@item.Servico</td>
+                    <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>R$ @item.Valor.ToString("N2")</td>
+                    <td>@item.Status</td>
+
+                    <td>
+                        <a asp-action="Excluir"
+                               asp-route-id="@item.Id"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Deseja excluir este agendamento?')">
+                            Excluir
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>

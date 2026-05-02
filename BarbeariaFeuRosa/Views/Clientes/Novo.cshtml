@@ -1,0 +1,57 @@
+﻿@model BarbeariaFeuRosa.Models.Cliente
+
+@{
+    ViewData["Title"] = "Novo Cliente";
+}
+
+<div class="container p-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Novo Cliente</h2>
+
+        <a href="/Clientes" class="btn btn-outline-dark">
+            ← Voltar
+        </a>
+    </div>
+
+    <hr />
+
+    <form method="post">
+
+        <div class="mb-3">
+            <label>Nome</label>
+            <input asp-for="Nome" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>WhatsApp</label>
+            <input asp-for="WhatsApp"
+                   id="whatsapp"
+                   class="form-control"
+                   inputmode="numeric"
+                   placeholder="(00) 00000-0000" />
+        </div>
+
+        <button type="submit" class="btn btn-dark">
+            Salvar
+        </button>
+
+    </form>
+
+</div>
+
+<script>
+    document.getElementById("whatsapp").addEventListener("input", function(e) {
+        let v = e.target.value.replace(/\D/g, '');
+
+        if (v.length > 11)
+            v = v.substring(0, 11);
+
+        if (v.length > 6)
+            v = v.replace(/^(\d{2})(\d{5})(\d+)/, '($1) $2-$3');
+        else if (v.length > 2)
+            v = v.replace(/^(\d{2})(\d+)/, '($1) $2');
+
+        e.target.value = v;
+    });
+</script>

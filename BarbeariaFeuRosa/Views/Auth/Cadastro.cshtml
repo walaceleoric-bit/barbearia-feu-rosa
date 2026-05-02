@@ -1,0 +1,82 @@
+﻿@model BarbeariaFeuRosa.Models.Usuario
+
+@{
+    ViewData["Title"] = "Cadastro";
+}
+
+<div class="container mt-5" style="max-width:450px;">
+
+    <div class="text-center mb-4">
+        <h2>Criar Conta</h2>
+        <p class="text-muted">Cliente Barbearia Feu Rosa</p>
+    </div>
+
+
+    @if (ViewBag.Erro != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Erro
+        </div>
+    }
+
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Sucesso"]
+        </div>
+    }
+
+
+    <form asp-action="Cadastro" method="post">
+
+        <div asp-validation-summary="All"
+             class="text-danger mb-3">
+        </div>
+
+
+        <div class="mb-3">
+
+            <label>Usuário</label>
+
+            <input asp-for="UsuarioLogin"
+                   class="form-control"
+                   autocomplete="off"
+                   required />
+
+        </div>
+
+
+        <div class="mb-3">
+
+            <label>Senha (6 dígitos)</label>
+
+            <input asp-for="Senha"
+                   type="password"
+                   maxlength="6"
+                   minlength="6"
+                   inputmode="numeric"
+                   class="form-control"
+                   required />
+
+        </div>
+
+
+        <button type="submit"
+                class="btn btn-dark w-100">
+
+            Cadastrar
+
+        </button>
+
+
+        <a href="/Auth/Login"
+               class="btn btn-outline-dark w-100 mt-2">
+
+            Já tenho conta
+
+        </a>
+
+    </form>
+
+</div>

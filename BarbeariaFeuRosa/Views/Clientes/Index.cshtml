@@ -1,0 +1,69 @@
+﻿@model List<BarbeariaFeuRosa.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Clientes</h2>
+
+        <a href="/Dashboard" class="btn btn-outline-dark">
+            ← Voltar ao Painel
+        </a>
+    </div>
+
+    <hr />
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Sucesso"]
+        </div>
+    }
+
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Erro"]
+        </div>
+    }
+
+    <a asp-action="Novo" class="btn btn-dark mb-3">
+        + Novo Cliente
+    </a>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Nome</th>
+                <th>WhatsApp</th>
+                <th style="width: 180px;">Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var cliente in Model)
+            {
+                <tr>
+                    <td>@cliente.Nome</td>
+                    <td>@cliente.WhatsApp</td>
+                    <td>
+                        <a asp-action="Editar" asp-route-id="@cliente.Id" class="btn btn-sm btn-warning">
+                            Editar
+                        </a>
+
+                        <a asp-action="Excluir"
+                               asp-route-id="@cliente.Id"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Tem certeza que deseja excluir este cliente?');">
+                            Excluir
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
