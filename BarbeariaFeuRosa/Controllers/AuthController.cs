@@ -16,12 +16,15 @@ namespace BarbeariaFeuRosa.Controllers
         // LOGIN
         public IActionResult Login()
         {
+            CarregarConfiguracoes();
             return View();
         }
 
         [HttpPost]
         public IActionResult Login(string usuarioLogin, string senha)
         {
+            CarregarConfiguracoes();
+
             var usuario = _context.Usuarios
                 .FirstOrDefault(u =>
                     u.UsuarioLogin == usuarioLogin &&
@@ -42,26 +45,27 @@ namespace BarbeariaFeuRosa.Controllers
                 HttpContext.Session.SetInt32("BarbeiroId", usuario.BarbeiroId.Value);
             }
 
-            // FLUXO POR PERFIL
             if (usuario.Tipo == "ADM")
                 return RedirectToAction("Index", "Dashboard");
 
             if (usuario.Tipo == "BARBEIRO")
                 return RedirectToAction("Index", "PainelBarbeiro");
 
-            // CLIENTE
             return RedirectToAction("Index", "ClienteHome");
         }
 
         // CADASTRO
         public IActionResult Cadastro()
         {
+            CarregarConfiguracoes();
             return View();
         }
 
         [HttpPost]
         public IActionResult Cadastro(Usuario usuario)
         {
+            CarregarConfiguracoes();
+
             usuario.Nome = usuario.UsuarioLogin;
             usuario.Tipo = "CLIENTE";
 
@@ -96,6 +100,13 @@ namespace BarbeariaFeuRosa.Controllers
             HttpContext.Session.Clear();
 
             return RedirectToAction("Login");
+        }
+
+        private void CarregarConfiguracoes()
+        {
+            var config = _context.Configuracoes.FirstOrDefault();
+
+            ViewBag.NomeBarbearia = config?.NomeBarbearia ?? "Barbearia Feu Rosa";
         }
     }
 }

@@ -5,8 +5,13 @@
 <div class="container mt-5" style="max-width:450px;">
 
     <div class="text-center mb-4">
-        <h2>✂ Feu Rosa</h2>
-        <p class="text-muted">Acesse sua conta</p>
+        <h2 class="fw-bold">
+            @ViewBag.NomeBarbearia
+        </h2>
+
+        <p class="text-muted">
+            Acesse sua conta
+        </p>
     </div>
 
     @if (ViewBag.Erro != null)
@@ -40,7 +45,7 @@
         </button>
 
         <a href="/Auth/Cadastro"
-               class="btn btn-outline-dark w-100 mt-2">
+           class="btn btn-outline-dark w-100 mt-2">
             Criar conta
         </a>
 

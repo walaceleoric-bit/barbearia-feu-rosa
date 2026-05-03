@@ -1,12 +1,37 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Walace\\source\\repos\\BarbeariaFeuRosa\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E15FBE5F-516D-4D31-B48D-E8972D067B70}|BarbeariaFeuRosa\\BarbeariaFeuRosa.csproj|c:\\users\\walace\\source\\repos\\barbeariafeurosa\\barbeariafeurosa\\views\\configuracoes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E15FBE5F-516D-4D31-B48D-E8972D067B70}|BarbeariaFeuRosa\\BarbeariaFeuRosa.csproj|solutionrelative:barbeariafeurosa\\views\\configuracoes\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\Walace\\source\\repos\\BarbeariaFeuRosa\\BarbeariaFeuRosa\\Views\\Configuracoes\\Index.cshtml",
+              "RelativeDocumentMoniker": "BarbeariaFeuRosa\\Views\\Configuracoes\\Index.cshtml",
+              "ToolTip": "C:\\Users\\Walace\\source\\repos\\BarbeariaFeuRosa\\BarbeariaFeuRosa\\Views\\Configuracoes\\Index.cshtml",
+              "RelativeToolTip": "BarbeariaFeuRosa\\Views\\Configuracoes\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-02T21:25:51.079Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
