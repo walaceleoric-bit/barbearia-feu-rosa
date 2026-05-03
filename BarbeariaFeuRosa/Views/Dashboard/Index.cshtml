@@ -8,58 +8,98 @@
 
     <div class="row">
 
-        <div class="col-2 bg-dark text-white vh-100 p-3">
+        <div class="col-2 bg-dark text-white vh-100 p-3 d-flex flex-column">
 
-            <div class="text-center mb-3">
+            <div>
 
-                @if (!string.IsNullOrEmpty(ViewBag.LogoUrl))
-                {
-                    <img src="@ViewBag.LogoUrl"
-                         style="max-height: 90px; max-width: 100%; object-fit: contain;"
-                         class="mb-2" />
-                }
+                <div class="text-center mb-3">
 
-                <h5 class="fw-bold">
-                    @ViewBag.NomeBarbearia
-                </h5>
+                    @if (!string.IsNullOrEmpty(ViewBag.LogoUrl))
+                    {
+                        <img src="@ViewBag.LogoUrl"
+                             style="max-height: 90px; max-width: 100%; object-fit: contain;"
+                             class="mb-2" />
+                    }
+
+                    <h5 class="fw-bold">
+                        @ViewBag.NomeBarbearia
+                    </h5>
+
+                </div>
+
+                <hr />
+
+                <a href="/Dashboard" class="text-white text-decoration-none d-block mb-3">
+                    🏠 Dashboard
+                </a>
+
+                <a href="/Agenda" class="text-white text-decoration-none d-block mb-3">
+                    📅 Agenda
+                </a>
+
+                <a href="/Clientes" class="text-white text-decoration-none d-block mb-3">
+                    👤 Clientes
+                </a>
+
+                <a href="/Barbeiros" class="text-white text-decoration-none d-block mb-3">
+                    ✂ Barbeiros
+                </a>
+
+                <a href="/Financeiro" class="text-white text-decoration-none d-block mb-3">
+                    💰 Financeiro
+                </a>
+
+                <a href="/Configuracoes" class="text-white text-decoration-none d-block mb-3">
+                    ⚙ Configurações
+                </a>
 
             </div>
 
-            <hr />
 
-            <a href="/Dashboard" class="text-white text-decoration-none d-block mb-3">🏠 Dashboard</a>
-            <a href="/Agenda" class="text-white text-decoration-none d-block mb-3">📅 Agenda</a>
-            <a href="/Clientes" class="text-white text-decoration-none d-block mb-3">👤 Clientes</a>
-            <a href="/Barbeiros" class="text-white text-decoration-none d-block mb-3">✂ Barbeiros</a>
-            <a href="/Financeiro" class="text-white text-decoration-none d-block mb-3">💰 Financeiro</a>
-            <a href="/Configuracoes" class="text-white text-decoration-none d-block mb-3">⚙ Configurações</a>
+            <!-- Sair fixado embaixo -->
+            <div class="mt-auto">
+
+                <hr />
+
+                <a href="/Auth/Sair"
+                   class="text-white text-decoration-none d-block fw-bold">
+                    🚪 Sair
+                </a>
+
+            </div>
 
         </div>
+
 
         <div class="col-10 p-4">
 
             <h2>Painel Administrativo</h2>
-            <p class="text-muted">Visão geral da @ViewBag.NomeBarbearia</p>
+            <p class="text-white">Visão geral da @ViewBag.NomeBarbearia</p>
+
             <hr />
 
             <div class="row">
 
                 <div class="col-md-3 mb-3">
-                    <a href="/Clientes" class="text-decoration-none text-dark">
+                    <a href="/Clientes" class="text-decoration-none text-white">
                         <div class="card p-3 shadow-sm">
                             <h5>Clientes</h5>
                             <h2>@ViewBag.TotalClientes</h2>
-                            <small class="text-muted">Clientes cadastrados</small>
+                            <small class="text-white">
+                                Clientes cadastrados
+                            </small>
                         </div>
                     </a>
                 </div>
 
                 <div class="col-md-3 mb-3">
-                    <a href="/Agenda" class="text-decoration-none text-dark">
+                    <a href="/Agenda" class="text-decoration-none text-white">
                         <div class="card p-3 shadow-sm">
                             <h5>Agendamentos</h5>
                             <h2>@ViewBag.AgendamentosHoje</h2>
-                            <small class="text-muted">Agendamentos de hoje</small>
+                            <small class="text-white">
+                                Agendamentos de hoje
+                            </small>
                         </div>
                     </a>
                 </div>
@@ -68,7 +108,9 @@
                     <div class="card p-3 shadow-sm">
                         <h5>Hoje</h5>
                         <h2>@ViewBag.FaturamentoHoje</h2>
-                        <small class="text-muted">Faturamento diário</small>
+                        <small class="text-white">
+                            Faturamento diário
+                        </small>
                     </div>
                 </div>
 
@@ -76,7 +118,9 @@
                     <div class="card p-3 shadow-sm">
                         <h5>Mês</h5>
                         <h2>@ViewBag.FaturamentoMes</h2>
-                        <small class="text-muted">Faturamento mensal</small>
+                        <small class="text-white">
+                            Faturamento mensal
+                        </small>
                     </div>
                 </div>
 
@@ -85,14 +129,19 @@
             <div class="row mt-4">
 
                 <div class="col-md-8">
+
                     <div class="card p-4 shadow-sm">
+
                         <h5>Agenda do Dia</h5>
+
                         <hr />
 
                         @if (agendaHoje != null && agendaHoje.Any())
                         {
                             <table class="table table-sm table-bordered">
+
                                 <thead class="table-dark">
+
                                     <tr>
                                         <th>Hora</th>
                                         <th>Cliente</th>
@@ -101,9 +150,11 @@
                                         <th>Valor</th>
                                         <th>Status</th>
                                     </tr>
+
                                 </thead>
 
                                 <tbody>
+
                                     @foreach (var item in agendaHoje)
                                     {
                                         <tr>
@@ -115,24 +166,36 @@
                                             <td>@item.Status</td>
                                         </tr>
                                     }
+
                                 </tbody>
+
                             </table>
                         }
                         else
                         {
-                            <p class="text-muted">
+                            <p class="text-white">
                                 Nenhum agendamento cadastrado para hoje.
                             </p>
                         }
+
                     </div>
+
                 </div>
 
                 <div class="col-md-4">
+
                     <div class="card p-4 shadow-sm">
+
                         <h5>Promoção em Destaque</h5>
+
                         <hr />
-                        <p>@ViewBag.PromocaoDestaque</p>
+
+                        <p class="text-white">
+                            @ViewBag.PromocaoDestaque
+                        </p>
+
                     </div>
+
                 </div>
 
             </div>
