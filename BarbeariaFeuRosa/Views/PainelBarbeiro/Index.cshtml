@@ -2,8 +2,11 @@
 
 @{
     ViewData["Title"] = "Painel do Barbeiro";
+
     var proximos = ViewBag.Proximos as List<BarbeariaFeuRosa.Models.Agendamento>;
+
     string filtroAtual = ViewBag.FiltroAtual ?? "hoje";
+    string secaoAtual = ViewBag.SecaoAtual ?? "inicio";
 }
 
 <div class="container-fluid">
@@ -20,68 +23,62 @@
 
             <hr />
 
-            <div class="col-2 bg-dark text-white vh-100 p-3">
+            <a href="/PainelBarbeiro?secao=inicio"
+               class="text-white text-decoration-none d-block mb-3">
+                🏠 Início
+            </a>
 
-    <div class="text-center mb-4">
+            <a href="/PainelBarbeiro?secao=agenda&filtro=hoje"
+               class="text-white text-decoration-none d-block mb-3">
+                📅 Minha Agenda
+            </a>
 
-        <h3>✂</h3>
+            <a href="/PainelBarbeiro?secao=proximos"
+               class="text-white text-decoration-none d-block mb-3">
+                ⏰ Próximos
+            </a>
 
-        <h5>@ViewBag.NomeBarbeiro</h5>
+            <a href="/PainelBarbeiro?secao=ganhos"
+               class="text-white text-decoration-none d-block mb-3">
+                💰 Meus Ganhos
+            </a>
 
-        <small class="text-white-50">
-            Painel Profissional
-        </small>
-
-    </div>
-
-    <hr />
-
-    <a href="/PainelBarbeiro?filtro=hoje"
-       class="btn btn-outline-light w-100 mb-3 text-start">
-        🏠 Início
-    </a>
-
-    <a href="#agendaHoje"
-       class="btn btn-outline-success w-100 mb-3 text-start">
-        📅 Minha Agenda
-    </a>
-
-    <a href="#proximos"
-       class="btn btn-outline-info w-100 mb-3 text-start">
-        ⏰ Próximos
-    </a>
-
-    <a href="#ganhos"
-       class="btn btn-outline-warning w-100 mb-3 text-start">
-        💰 Meus Ganhos
-    </a>
-
-    <div class="mt-5 pt-5">
-
-        <hr />
-
-        <a href="/Auth/Sair"
-           class="btn btn-outline-danger w-100 text-start">
-            🚪 Sair
-        </a>
-
-    </div>
-
-</div>
+            <a href="/Auth/Sair"
+               class="text-white text-decoration-none d-block mt-5">
+                🚪 Sair
+            </a>
 
         </div>
 
         <div class="col-10 p-4">
 
             <div class="d-flex justify-content-between align-items-center">
+
                 <div>
                     <h2>Olá, @ViewBag.NomeBarbeiro</h2>
-                    <p class="text-muted">Gerencie seus atendimentos, status e ganhos.</p>
+
+                    @if (secaoAtual == "inicio")
+                    {
+                        <p class="text-muted">Resumo dos seus atendimentos de hoje.</p>
+                    }
+                    else if (secaoAtual == "agenda")
+                    {
+                        <p class="text-muted">Gerencie seus agendamentos e status.</p>
+                    }
+                    else if (secaoAtual == "proximos")
+                    {
+                        <p class="text-muted">Veja seus próximos atendimentos.</p>
+                    }
+                    else if (secaoAtual == "ganhos")
+                    {
+                        <p class="text-muted">Acompanhe suas comissões.</p>
+                    }
                 </div>
 
                 <a href="/Auth/Sair" class="btn btn-outline-danger">
                     Sair
                 </a>
+
             </div>
 
             <hr />
@@ -100,174 +97,111 @@
                 </div>
             }
 
-            <div class="row mb-4">
+            @if (secaoAtual == "inicio")
+            {
+                <div class="row mb-4">
 
-                <div class="col-md-3">
-                    <div class="card shadow-sm p-3 border-0">
-                        <small class="text-muted">Agendamentos Hoje</small>
-                        <h3>@ViewBag.TotalHoje</h3>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm p-3 border-0">
+                            <small class="text-muted">Agendamentos Hoje</small>
+                            <h3>@ViewBag.TotalHoje</h3>
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-md-3">
-                    <div class="card shadow-sm p-3 border-0">
-                        <small class="text-muted">Pendentes Hoje</small>
-                        <h3>@ViewBag.PendentesHoje</h3>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm p-3 border-0">
+                            <small class="text-muted">Pendentes Hoje</small>
+                            <h3>@ViewBag.PendentesHoje</h3>
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-md-3">
-                    <div class="card shadow-sm p-3 border-0">
-                        <small class="text-muted">Finalizados Hoje</small>
-                        <h3>@ViewBag.FinalizadosHoje</h3>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm p-3 border-0">
+                            <small class="text-muted">Finalizados Hoje</small>
+                            <h3>@ViewBag.FinalizadosHoje</h3>
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-md-3">
-                    <div class="card shadow-sm p-3 border-0">
-                        <small class="text-muted">Faturamento Hoje</small>
-                        <h3>@ViewBag.FaturamentoHoje</h3>
-                    </div>
-                </div>
-
-            </div>
-
-            <div id="ganhos" class="row mb-4">
-
-                <div class="col-md-6">
-                    <div class="card shadow-sm p-3 border-0 bg-light">
-                        <small class="text-muted">Minha Comissão Hoje</small>
-                        <h3>@ViewBag.ComissaoHoje</h3>
-                        <small>Comissão: @ViewBag.ComissaoPercentual%</small>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card shadow-sm p-3 border-0 bg-light">
-                        <small class="text-muted">Minha Comissão no Mês</small>
-                        <h3>@ViewBag.ComissaoMes</h3>
-                        <small>Somente atendimentos finalizados</small>
-                    </div>
-                </div>
-
-            </div>
-
-            <div id="proximos" class="card shadow-sm p-4 mb-4">
-
-                <h4>Próximos Atendimentos</h4>
-
-                <hr />
-
-                @if (proximos != null && proximos.Any())
-                {
-                    <div class="row">
-
-                        @foreach (var item in proximos)
-                        {
-                            string whatsapp = item.Cliente?.WhatsApp ?? "";
-                            string whatsappLimpo = whatsapp
-                                .Replace(" ", "")
-                                .Replace("(", "")
-                                .Replace(")", "")
-                                .Replace("-", "");
-
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-0 shadow-sm p-3 bg-light">
-
-                                    <h5>@item.Cliente?.Nome</h5>
-
-                                    <p class="mb-1">
-                                        <strong>Serviço:</strong> @item.Servico
-                                    </p>
-
-                                    <p class="mb-1">
-                                        <strong>Horário:</strong> @item.DataHora.ToString("dd/MM/yyyy HH:mm")
-                                    </p>
-
-                                    <p class="mb-1">
-                                        <strong>Valor:</strong> R$ @item.Valor.ToString("N2")
-                                    </p>
-
-                                    <p class="mb-2">
-                                        <strong>Status:</strong> @item.Status
-                                    </p>
-
-                                    @if (!string.IsNullOrWhiteSpace(whatsappLimpo))
-                                    {
-                                        <a href="https://wa.me/55@whatsappLimpo"
-                                               target="_blank"
-                                               class="btn btn-success btn-sm">
-                                            WhatsApp
-                                        </a>
-                                    }
-
-                                </div>
-                            </div>
-                        }
-
-                    </div>
-                }
-                else
-                {
-                    <div class="text-center p-4">
-                        <h5>Nenhum próximo atendimento encontrado.</h5>
-                        <p class="text-muted mb-0">Quando houver agendamento, ele aparecerá aqui.</p>
-                    </div>
-                }
-
-            </div>
-
-            <div id="agendaHoje" class="card shadow-sm p-4">
-
-                <div class="d-flex justify-content-between align-items-center">
-
-                    <h4>Minha Agenda</h4>
-
-                    <div>
-                        <a href="/PainelBarbeiro?filtro=hoje"
-                               class="btn btn-sm @(filtroAtual == "hoje" ? "btn-dark" : "btn-outline-dark")">
-                            Hoje
-                        </a>
-
-                        <a href="/PainelBarbeiro?filtro=amanha"
-                               class="btn btn-sm @(filtroAtual == "amanha" ? "btn-dark" : "btn-outline-dark")">
-                            Amanhã
-                        </a>
-
-                        <a href="/PainelBarbeiro?filtro=semana"
-                               class="btn btn-sm @(filtroAtual == "semana" ? "btn-dark" : "btn-outline-dark")">
-                            Semana
-                        </a>
-
-                        <a href="/PainelBarbeiro?filtro=todos"
-                               class="btn btn-sm @(filtroAtual == "todos" ? "btn-dark" : "btn-outline-dark")">
-                            Todos
-                        </a>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm p-3 border-0">
+                            <small class="text-muted">Faturamento Hoje</small>
+                            <h3>@ViewBag.FaturamentoHoje</h3>
+                        </div>
                     </div>
 
                 </div>
 
-                <hr />
+                <div class="card shadow-sm p-4">
+                    <h4>Bem-vindo ao seu painel</h4>
+                    <hr />
 
-                @if (Model.Any())
-                {
-                    <table class="table table-bordered table-hover align-middle">
+                    <p>
+                        Use o menu lateral para acessar sua agenda, próximos atendimentos e seus ganhos.
+                    </p>
 
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Cliente</th>
-                                <th>WhatsApp</th>
-                                <th>Serviço</th>
-                                <th>Data/Hora</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th width="360">Ações Rápidas</th>
-                            </tr>
-                        </thead>
+                    <div class="row mt-3">
 
-                        <tbody>
+                        <div class="col-md-4 mb-3">
+                            <a href="/PainelBarbeiro?secao=agenda&filtro=hoje"
+                               class="btn btn-success w-100">
+                                📅 Ver Minha Agenda
+                            </a>
+                        </div>
 
-                            @foreach (var item in Model)
+                        <div class="col-md-4 mb-3">
+                            <a href="/PainelBarbeiro?secao=proximos"
+                               class="btn btn-primary w-100">
+                                ⏰ Próximos Atendimentos
+                            </a>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <a href="/PainelBarbeiro?secao=ganhos"
+                               class="btn btn-warning w-100">
+                                💰 Ver Ganhos
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+            @if (secaoAtual == "ganhos")
+            {
+                <div id="ganhos" class="row mb-4">
+
+                    <div class="col-md-6">
+                        <div class="card shadow-sm p-4 border-0">
+                            <small class="text-muted">Minha Comissão Hoje</small>
+                            <h2>@ViewBag.ComissaoHoje</h2>
+                            <p>Comissão: @ViewBag.ComissaoPercentual%</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card shadow-sm p-4 border-0">
+                            <small class="text-muted">Minha Comissão no Mês</small>
+                            <h2>@ViewBag.ComissaoMes</h2>
+                            <p>Somente atendimentos finalizados entram no cálculo.</p>
+                        </div>
+                    </div>
+
+                </div>
+            }
+
+            @if (secaoAtual == "proximos")
+            {
+                <div id="proximos" class="card shadow-sm p-4 mb-4">
+
+                    <h4>Próximos Atendimentos</h4>
+
+                    <hr />
+
+                    @if (proximos != null && proximos.Any())
+                    {
+                        <div class="row">
+
+                            @foreach (var item in proximos)
                             {
                                 string whatsapp = item.Cliente?.WhatsApp ?? "";
                                 string whatsappLimpo = whatsapp
@@ -276,135 +210,240 @@
                                     .Replace(")", "")
                                     .Replace("-", "");
 
-                                <tr>
-                                    <td>@item.Cliente?.Nome</td>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card border-0 shadow-sm p-3">
 
-                                    <td>
+                                        <h5>@item.Cliente?.Nome</h5>
+
+                                        <p class="mb-1">
+                                            <strong>Serviço:</strong> @item.Servico
+                                        </p>
+
+                                        <p class="mb-1">
+                                            <strong>Horário:</strong> @item.DataHora.ToString("dd/MM/yyyy HH:mm")
+                                        </p>
+
+                                        <p class="mb-1">
+                                            <strong>Valor:</strong> R$ @item.Valor.ToString("N2")
+                                        </p>
+
+                                        <p class="mb-2">
+                                            <strong>Status:</strong> @item.Status
+                                        </p>
+
                                         @if (!string.IsNullOrWhiteSpace(whatsappLimpo))
                                         {
                                             <a href="https://wa.me/55@whatsappLimpo"
-                                                   target="_blank"
-                                                   class="btn btn-success btn-sm">
-                                                Chamar
+                                               target="_blank"
+                                               class="btn btn-success btn-sm">
+                                                WhatsApp
                                             </a>
                                         }
-                                        else
-                                        {
-                                            <span class="text-muted">Sem número</span>
-                                        }
-                                    </td>
 
-                                    <td>@item.Servico</td>
-
-                                    <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
-
-                                    <td>R$ @item.Valor.ToString("N2")</td>
-
-                                    <td>
-                                        @if (item.Status == "Finalizado")
-                                        {
-                                            <span class="badge bg-success">Finalizado</span>
-                                        }
-                                        else if (item.Status == "Cancelado")
-                                        {
-                                            <span class="badge bg-danger">Cancelado</span>
-                                        }
-                                        else if (item.Status == "Faltou")
-                                        {
-                                            <span class="badge bg-warning text-dark">Faltou</span>
-                                        }
-                                        else if (item.Status == "Em Atendimento")
-                                        {
-                                            <span class="badge bg-primary">Em Atendimento</span>
-                                        }
-                                        else if (item.Status == "Confirmado")
-                                        {
-                                            <span class="badge bg-info text-dark">Confirmado</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">@item.Status</span>
-                                        }
-                                    </td>
-
-                                    <td>
-                                        <div class="d-flex flex-wrap gap-2 p-2 rounded"
-                                             style="background:#111; border:1px solid #333;">
-
-                                            <form asp-action="AlterarStatus" method="post">
-                                                <input type="hidden" name="id" value="@item.Id" />
-                                                <input type="hidden" name="status" value="Confirmado" />
-                                                <input type="hidden" name="filtroAtual" value="@filtroAtual" />
-
-                                                <button class="btn btn-info text-white btn-sm">
-                                                    Confirmar
-                                                </button>
-                                            </form>
-
-
-                                            <form asp-action="AlterarStatus" method="post">
-                                                <input type="hidden" name="id" value="@item.Id" />
-                                                <input type="hidden" name="status" value="Em Atendimento" />
-                                                <input type="hidden" name="filtroAtual" value="@filtroAtual" />
-
-                                                <button class="btn btn-primary btn-sm">
-                                                    Iniciar
-                                                </button>
-                                            </form>
-
-
-                                            <form asp-action="AlterarStatus" method="post">
-                                                <input type="hidden" name="id" value="@item.Id" />
-                                                <input type="hidden" name="status" value="Finalizado" />
-                                                <input type="hidden" name="filtroAtual" value="@filtroAtual" />
-
-                                                <button class="btn btn-success btn-sm">
-                                                    Finalizar
-                                                </button>
-                                            </form>
-
-
-                                            <form asp-action="AlterarStatus" method="post">
-                                                <input type="hidden" name="id" value="@item.Id" />
-                                                <input type="hidden" name="status" value="Faltou" />
-                                                <input type="hidden" name="filtroAtual" value="@filtroAtual" />
-
-                                                <button class="btn btn-warning btn-sm">
-                                                    Faltou
-                                                </button>
-                                            </form>
-
-
-                                            <form asp-action="AlterarStatus" method="post">
-                                                <input type="hidden" name="id" value="@item.Id" />
-                                                <input type="hidden" name="status" value="Cancelado" />
-                                                <input type="hidden" name="filtroAtual" value="@filtroAtual" />
-
-                                                <button class="btn btn-danger btn-sm">
-                                                    Cancelar
-                                                </button>
-                                            </form>
-
-                                        </div>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </div>
                             }
 
-                        </tbody>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center p-4">
+                            <h5>Nenhum próximo atendimento encontrado.</h5>
+                            <p class="text-muted mb-0">Quando houver agendamento, ele aparecerá aqui.</p>
+                        </div>
+                    }
 
-                    </table>
-                }
-                else
-                {
-                    <div class="text-center p-5">
-                        <h4>Nenhum agendamento encontrado</h4>
-                        <p class="text-muted mb-0">
-                            Não existe atendimento para o filtro selecionado.
-                        </p>
+                </div>
+            }
+
+            @if (secaoAtual == "agenda")
+            {
+                <div id="agendaHoje" class="card shadow-sm p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <h4>Minha Agenda</h4>
+
+                        <div>
+                            <a href="/PainelBarbeiro?secao=agenda&filtro=hoje"
+                               class="btn btn-sm @(filtroAtual == "hoje" ? "btn-dark" : "btn-outline-dark")">
+                                Hoje
+                            </a>
+
+                            <a href="/PainelBarbeiro?secao=agenda&filtro=amanha"
+                               class="btn btn-sm @(filtroAtual == "amanha" ? "btn-dark" : "btn-outline-dark")">
+                                Amanhã
+                            </a>
+
+                            <a href="/PainelBarbeiro?secao=agenda&filtro=semana"
+                               class="btn btn-sm @(filtroAtual == "semana" ? "btn-dark" : "btn-outline-dark")">
+                                Semana
+                            </a>
+
+                            <a href="/PainelBarbeiro?secao=agenda&filtro=todos"
+                               class="btn btn-sm @(filtroAtual == "todos" ? "btn-dark" : "btn-outline-dark")">
+                                Todos
+                            </a>
+                        </div>
+
                     </div>
-                }
 
-            </div>
+                    <hr />
+
+                    @if (Model.Any())
+                    {
+                        <table class="table table-bordered table-hover align-middle">
+
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>WhatsApp</th>
+                                    <th>Serviço</th>
+                                    <th>Data/Hora</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th width="360">Ações Rápidas</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    string whatsapp = item.Cliente?.WhatsApp ?? "";
+                                    string whatsappLimpo = whatsapp
+                                        .Replace(" ", "")
+                                        .Replace("(", "")
+                                        .Replace(")", "")
+                                        .Replace("-", "");
+
+                                    <tr>
+                                        <td>@item.Cliente?.Nome</td>
+
+                                        <td>
+                                            @if (!string.IsNullOrWhiteSpace(whatsappLimpo))
+                                            {
+                                                <a href="https://wa.me/55@whatsappLimpo"
+                                                   target="_blank"
+                                                   class="btn btn-success btn-sm">
+                                                    Chamar
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Sem número</span>
+                                            }
+                                        </td>
+
+                                        <td>@item.Servico</td>
+
+                                        <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
+
+                                        <td>R$ @item.Valor.ToString("N2")</td>
+
+                                        <td>
+                                            @if (item.Status == "Finalizado")
+                                            {
+                                                <span class="badge bg-success">Finalizado</span>
+                                            }
+                                            else if (item.Status == "Cancelado")
+                                            {
+                                                <span class="badge bg-danger">Cancelado</span>
+                                            }
+                                            else if (item.Status == "Faltou")
+                                            {
+                                                <span class="badge bg-warning text-dark">Faltou</span>
+                                            }
+                                            else if (item.Status == "Em Atendimento")
+                                            {
+                                                <span class="badge bg-primary">Em Atendimento</span>
+                                            }
+                                            else if (item.Status == "Confirmado")
+                                            {
+                                                <span class="badge bg-info text-dark">Confirmado</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@item.Status</span>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-2 p-2 rounded"
+                                                 style="background:#111; border:1px solid #333;">
+
+                                                <form asp-action="AlterarStatus" method="post">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <input type="hidden" name="status" value="Confirmado" />
+                                                    <input type="hidden" name="filtroAtual" value="@filtroAtual" />
+
+                                                    <button class="btn btn-info text-white btn-sm">
+                                                        Confirmar
+                                                    </button>
+                                                </form>
+
+                                                <form asp-action="AlterarStatus" method="post">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <input type="hidden" name="status" value="Em Atendimento" />
+                                                    <input type="hidden" name="filtroAtual" value="@filtroAtual" />
+
+                                                    <button class="btn btn-primary btn-sm">
+                                                        Iniciar
+                                                    </button>
+                                                </form>
+
+                                                <form asp-action="AlterarStatus" method="post">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <input type="hidden" name="status" value="Finalizado" />
+                                                    <input type="hidden" name="filtroAtual" value="@filtroAtual" />
+
+                                                    <button class="btn btn-success btn-sm">
+                                                        Finalizar
+                                                    </button>
+                                                </form>
+
+                                                <form asp-action="AlterarStatus" method="post">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <input type="hidden" name="status" value="Faltou" />
+                                                    <input type="hidden" name="filtroAtual" value="@filtroAtual" />
+
+                                                    <button class="btn btn-warning btn-sm">
+                                                        Faltou
+                                                    </button>
+                                                </form>
+
+                                                <form asp-action="AlterarStatus" method="post">
+                                                    <input type="hidden" name="id" value="@item.Id" />
+                                                    <input type="hidden" name="status" value="Cancelado" />
+                                                    <input type="hidden" name="filtroAtual" value="@filtroAtual" />
+
+                                                    <button class="btn btn-danger btn-sm">
+                                                        Cancelar
+                                                    </button>
+                                                </form>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="text-center p-5">
+                            <h4>Nenhum agendamento encontrado</h4>
+                            <p class="text-muted mb-0">
+                                Não existe atendimento para o filtro selecionado.
+                            </p>
+                        </div>
+                    }
+
+                </div>
+            }
 
         </div>
 

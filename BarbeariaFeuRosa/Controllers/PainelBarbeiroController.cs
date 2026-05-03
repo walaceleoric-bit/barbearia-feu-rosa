@@ -13,7 +13,7 @@ namespace BarbeariaFeuRosa.Controllers
             _context = context;
         }
 
-        public IActionResult Index(string filtro = "hoje")
+        public IActionResult Index(string secao = "inicio", string filtro = "hoje")
         {
             if (HttpContext.Session.GetString("UsuarioTipo") != "BARBEIRO")
                 return RedirectToAction("Login", "Auth");
@@ -29,6 +29,7 @@ namespace BarbeariaFeuRosa.Controllers
             ViewBag.NomeBarbeiro = barbeiro?.Nome ?? "Barbeiro";
             ViewBag.ComissaoPercentual = barbeiro?.ComissaoPercentual ?? 0;
             ViewBag.FiltroAtual = filtro;
+            ViewBag.SecaoAtual = secao;
 
             var hoje = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
             var amanha = hoje.AddDays(1);
@@ -141,7 +142,7 @@ namespace BarbeariaFeuRosa.Controllers
             if (agendamento == null)
             {
                 TempData["Erro"] = "Agendamento não encontrado.";
-                return RedirectToAction("Index", new { filtro = filtroAtual });
+                return RedirectToAction("Index", new { secao = "agenda", filtro = filtroAtual });
             }
 
             agendamento.Status = status;
@@ -149,7 +150,7 @@ namespace BarbeariaFeuRosa.Controllers
 
             TempData["Sucesso"] = "Status atualizado com sucesso.";
 
-            return RedirectToAction("Index", new { filtro = filtroAtual });
+            return RedirectToAction("Index", new { secao = "agenda", filtro = filtroAtual });
         }
     }
 }
