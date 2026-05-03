@@ -1,0 +1,58 @@
+@{
+    ViewData["Title"] = "Super Admin";
+}
+
+<div class="container mt-5" style="max-width:450px;">
+
+    <div class="card shadow p-4">
+
+        <div class="text-center mb-4">
+            <h2 class="text-white">
+                Painel do Dono
+            </h2>
+
+            <p class="text-white">
+                Gestão das Barbearias
+            </p>
+        </div>
+
+        @if (ViewBag.Erro != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.Erro
+            </div>
+        }
+
+        <form method="post">
+
+            <div class="mb-3">
+                <label class="text-white">
+                    Usuário
+                </label>
+
+                <input name="usuario"
+                       class="form-control"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="text-white">
+                    Senha
+                </label>
+
+                <input name="senha"
+                       type="password"
+                       maxlength="6"
+                       class="form-control"
+                       required />
+            </div>
+
+            <button class="btn btn-success w-100">
+                Entrar
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

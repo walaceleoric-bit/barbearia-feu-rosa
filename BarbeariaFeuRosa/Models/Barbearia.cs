@@ -15,5 +15,18 @@ namespace BarbeariaFeuRosa.Models
         public string LogoUrl { get; set; } = string.Empty;
 
         public bool Ativa { get; set; } = true;
+
+        public string Plano { get; set; } = "Mensal";
+
+        public decimal ValorMensalidade { get; set; } = 49.90m;
+
+        public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
+
+        public DateTime DataVencimento { get; set; }
+            = DateTime.UtcNow.AddDays(30);
+
+        public bool PagamentoEmDia { get; set; } = true;
+
+        public string Observacao { get; set; } = string.Empty;
     }
 }

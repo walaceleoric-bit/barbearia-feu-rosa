@@ -26,7 +26,27 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    bool existeAdm = context.Usuarios.Any(x => x.UsuarioLogin == "admin");
+    var barbearia = context.Barbearias
+        .FirstOrDefault(b => b.Id == 1);
+
+    if (barbearia == null)
+    {
+        context.Barbearias.Add(new Barbearia
+        {
+            Id = 1,
+            Nome = "Barbearia Feu Rosa",
+            Slug = "feu-rosa",
+            LogoUrl = "",
+            Ativa = true
+        });
+
+        context.SaveChanges();
+    }
+
+    bool existeAdm = context.Usuarios
+        .Any(x =>
+            x.UsuarioLogin == "admin" &&
+            x.BarbeariaId == 1);
 
     if (!existeAdm)
     {
@@ -35,7 +55,8 @@ using (var scope = app.Services.CreateScope())
             Nome = "Administrador",
             UsuarioLogin = "admin",
             Senha = "123456",
-            Tipo = "ADM"
+            Tipo = "ADM",
+            BarbeariaId = 1
         });
 
         context.SaveChanges();
@@ -57,6 +78,19 @@ app.UseRouting();
 app.UseSession();
 
 app.UseAuthorization();
+
+/*
+    ROTA FUTURA DO SAAS:
+    Exemplo:
+    /feu-rosa/Auth/Login
+    /feu-rosa/Dashboard
+    /feu-rosa/Clientes
+
+    Por enquanto ela já existe, mas os controllers ainda estão usando BarbeariaId = 1.
+*/
+app.MapControllerRoute(
+    name: "tenant",
+    pattern: "{barbeariaSlug}/{controller=Auth}/{action=Login}/{id?}");
 
 app.MapControllerRoute(
     name: "agenda",

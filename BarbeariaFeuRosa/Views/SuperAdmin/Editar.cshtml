@@ -1,0 +1,40 @@
+@model BarbeariaFeuRosa.Models.Barbearia
+
+<div class="container mt-4">
+
+    <div class="card p-4">
+
+        <h3 class="text-white mb-4">
+            Editar Barbearia
+        </h3>
+
+        <form method="post">
+
+            <input type="hidden"
+                   asp-for="Id" />
+
+            <input asp-for="Nome"
+                   class="form-control mb-3" />
+
+            <input asp-for="Slug"
+                   class="form-control mb-3" />
+
+            <input asp-for="Plano"
+                   class="form-control mb-3" />
+
+            <input asp-for="ValorMensalidade"
+                   class="form-control mb-3" />
+
+            <textarea asp-for="Observacao"
+                      class="form-control mb-3">
+            </textarea>
+
+            <button class="btn btn-primary">
+                Salvar
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

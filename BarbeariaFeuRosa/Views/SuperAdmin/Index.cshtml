@@ -1,0 +1,106 @@
+@model List<BarbeariaFeuRosa.Models.Barbearia>
+
+<div class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between mb-4">
+
+        <h2 class="text-white">
+            Minhas Barbearias
+        </h2>
+
+        <div>
+
+            <a href="/SuperAdmin/Nova"
+               class="btn btn-success">
+                + Nova
+            </a>
+
+            <a href="/SuperAdmin/Sair"
+               class="btn btn-danger">
+                Sair
+            </a>
+
+        </div>
+
+    </div>
+
+    <table class="table table-dark table-bordered">
+
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Slug</th>
+                <th>Plano</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+                <th width="220">Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>@item.Nome</td>
+
+                    <td>
+                        /@item.Slug
+                    </td>
+
+                    <td>@item.Plano</td>
+
+                    <td>
+                        @item.DataVencimento.ToString("dd/MM/yyyy")
+                    </td>
+
+                    <td>
+
+                        @if (item.Ativa)
+                        {
+                            <span class="badge bg-success">
+                                Ativa
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">
+                                Bloqueada
+                            </span>
+                        }
+
+                    </td>
+
+                    <td>
+
+                        <a href="/SuperAdmin/Editar/@item.Id"
+                           class="btn btn-primary btn-sm">
+                            Editar
+                        </a>
+
+                        @if (item.Ativa)
+                        {
+                            <a href="/SuperAdmin/Bloquear/@item.Id"
+                               class="btn btn-danger btn-sm">
+                                Bloquear
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/SuperAdmin/Liberar/@item.Id"
+                               class="btn btn-success btn-sm">
+                                Liberar
+                            </a>
+                        }
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

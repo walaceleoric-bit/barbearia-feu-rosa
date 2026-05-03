@@ -9,7 +9,11 @@ namespace BarbeariaFeuRosa.Controllers
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
-        public ConfiguracoesController(AppDbContext context, IWebHostEnvironment environment)
+        private const int BarbeariaAtualId = 1;
+
+        public ConfiguracoesController(
+            AppDbContext context,
+            IWebHostEnvironment environment)
         {
             _context = context;
             _environment = environment;
@@ -20,12 +24,15 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "ADM")
                 return RedirectToAction("Login", "Auth");
 
-            var configuracao = _context.Configuracoes.FirstOrDefault();
+            var configuracao = _context.Configuracoes
+                .FirstOrDefault();
 
             if (configuracao == null)
             {
                 configuracao = new Configuracao();
+
                 _context.Configuracoes.Add(configuracao);
+
                 _context.SaveChanges();
             }
 
@@ -47,11 +54,13 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "ADM")
                 return RedirectToAction("Login", "Auth");
 
-            var configAtual = _context.Configuracoes.FirstOrDefault();
+            var configAtual = _context.Configuracoes
+                .FirstOrDefault();
 
             if (configAtual == null)
             {
                 configAtual = new Configuracao();
+
                 _context.Configuracoes.Add(configAtual);
             }
 
@@ -80,21 +89,30 @@ namespace BarbeariaFeuRosa.Controllers
             {
                 if (novaSenhaAdm.Length > 6)
                 {
-                    TempData["Erro"] = "A nova senha do ADM deve ter no máximo 6 caracteres.";
+                    TempData["Erro"] =
+                        "A nova senha do ADM deve ter no máximo 6 caracteres.";
+
                     return RedirectToAction("Index");
                 }
 
-                var adm = _context.Usuarios.FirstOrDefault(u => u.Tipo == "ADM");
+                var adm = _context.Usuarios
+                    .FirstOrDefault(u =>
+                        u.Tipo == "ADM" &&
+                        u.BarbeariaId == BarbeariaAtualId);
 
                 if (adm == null)
                 {
-                    TempData["Erro"] = "Usuário ADM não encontrado.";
+                    TempData["Erro"] =
+                        "Usuário ADM não encontrado.";
+
                     return RedirectToAction("Index");
                 }
 
                 if (adm.Senha != senhaAdmAtual)
                 {
-                    TempData["Erro"] = "Senha atual do ADM incorreta.";
+                    TempData["Erro"] =
+                        "Senha atual do ADM incorreta.";
+
                     return RedirectToAction("Index");
                 }
 
@@ -103,24 +121,36 @@ namespace BarbeariaFeuRosa.Controllers
 
             _context.SaveChanges();
 
-            TempData["Sucesso"] = "Configurações salvas com sucesso!";
+            TempData["Sucesso"] =
+                "Configurações salvas com sucesso!";
 
             return RedirectToAction("Index");
         }
 
         private string SalvarArquivo(IFormFile arquivo)
         {
-            var pastaUploads = Path.Combine(_environment.WebRootPath, "uploads");
+            var pastaUploads = Path.Combine(
+                _environment.WebRootPath,
+                "uploads");
 
             if (!Directory.Exists(pastaUploads))
             {
-                Directory.CreateDirectory(pastaUploads);
+                Directory.CreateDirectory(
+                    pastaUploads);
             }
 
-            var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(arquivo.FileName);
-            var caminhoArquivo = Path.Combine(pastaUploads, nomeArquivo);
+            var nomeArquivo =
+                Guid.NewGuid().ToString() +
+                Path.GetExtension(arquivo.FileName);
 
-            using (var stream = new FileStream(caminhoArquivo, FileMode.Create))
+            var caminhoArquivo = Path.Combine(
+                pastaUploads,
+                nomeArquivo);
+
+            using (var stream =
+                   new FileStream(
+                       caminhoArquivo,
+                       FileMode.Create))
             {
                 arquivo.CopyTo(stream);
             }

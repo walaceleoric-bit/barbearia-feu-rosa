@@ -1,0 +1,38 @@
+@model BarbeariaFeuRosa.Models.Barbearia
+
+<div class="container mt-4">
+
+    <div class="card p-4">
+
+        <h3 class="text-white mb-4">
+            Nova Barbearia
+        </h3>
+
+        <form method="post">
+
+            <input asp-for="Nome"
+                   placeholder="Nome"
+                   class="form-control mb-3" />
+
+            <input asp-for="Slug"
+                   placeholder="Slug"
+                   class="form-control mb-3" />
+
+            <input name="usuarioAdm"
+                   placeholder="Login ADM"
+                   class="form-control mb-3" />
+
+            <input name="senhaAdm"
+                   placeholder="Senha ADM"
+                   maxlength="6"
+                   class="form-control mb-3" />
+
+            <button class="btn btn-success">
+                Criar Barbearia
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
