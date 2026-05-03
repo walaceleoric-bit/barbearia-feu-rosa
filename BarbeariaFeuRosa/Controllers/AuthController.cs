@@ -15,166 +15,80 @@ namespace BarbeariaFeuRosa.Controllers
             _context = context;
         }
 
-        // LOGIN
-        using Microsoft.AspNetCore.Mvc;
-using BarbeariaFeuRosa.Data;
-using BarbeariaFeuRosa.Models;
-
-namespace BarbeariaFeuRosa.Controllers
-    {
-        public class AuthController : Controller
+        public IActionResult Login()
         {
-            private readonly AppDbContext _context;
+            CarregarConfiguracoes();
+            return View();
+        }
 
-            private const int BarbeariaAtualId = 1;
+        [HttpPost]
+        public IActionResult Login(string usuarioLogin, string senha)
+        {
+            CarregarConfiguracoes();
 
-            public AuthController(AppDbContext context)
+            // SUPER ADMIN
+            if (usuarioLogin == "dono" && senha == "123456")
             {
-                _context = context;
-            }
-
-            // LOGIN
-            public IActionResult Login()
-            {
-                CarregarConfiguracoes();
-                return View();
-            }
-
-            [HttpPost]
-            public IActionResult Login(string usuarioLogin, string senha)
-            {
-                CarregarConfiguracoes();
-
-                // SUPER ADMIN
-                if (usuarioLogin == "dono" && senha == "123456")
-                {
-                    HttpContext.Session.SetString(
-                        "SuperAdmin",
-                        "SIM");
-
-                    return RedirectToAction(
-                        "Index",
-                        "SuperAdmin");
-                }
-
-                var usuario = _context.Usuarios
-                    .FirstOrDefault(u =>
-                        u.UsuarioLogin == usuarioLogin &&
-                        u.Senha == senha &&
-                        u.BarbeariaId == BarbeariaAtualId);
-
-                if (usuario == null)
-                {
-                    ViewBag.Erro = "Usuário ou senha inválidos.";
-                    return View();
-                }
-
-                HttpContext.Session.SetInt32(
-                    "UsuarioId",
-                    usuario.Id);
-
                 HttpContext.Session.SetString(
-                    "UsuarioNome",
-                    usuario.UsuarioLogin);
-
-                HttpContext.Session.SetString(
-                    "UsuarioTipo",
-                    usuario.Tipo);
-
-                HttpContext.Session.SetInt32(
-                    "BarbeariaId",
-                    usuario.BarbeariaId);
-
-                if (usuario.BarbeiroId.HasValue)
-                {
-                    HttpContext.Session.SetInt32(
-                        "BarbeiroId",
-                        usuario.BarbeiroId.Value);
-                }
-
-                if (usuario.Tipo == "ADM")
-                    return RedirectToAction(
-                        "Index",
-                        "Dashboard");
-
-                if (usuario.Tipo == "BARBEIRO")
-                    return RedirectToAction(
-                        "Index",
-                        "PainelBarbeiro");
+                    "SuperAdmin",
+                    "SIM");
 
                 return RedirectToAction(
                     "Index",
-                    "ClienteHome");
+                    "SuperAdmin");
             }
 
-            // CADASTRO
-            public IActionResult Cadastro()
+            var usuario = _context.Usuarios
+                .FirstOrDefault(u =>
+                    u.UsuarioLogin == usuarioLogin &&
+                    u.Senha == senha &&
+                    u.BarbeariaId == BarbeariaAtualId);
+
+            if (usuario == null)
             {
-                CarregarConfiguracoes();
+                ViewBag.Erro = "Usuário ou senha inválidos.";
                 return View();
             }
 
-            [HttpPost]
-            public IActionResult Cadastro(Usuario usuario)
+            HttpContext.Session.SetInt32(
+                "UsuarioId",
+                usuario.Id);
+
+            HttpContext.Session.SetString(
+                "UsuarioNome",
+                usuario.UsuarioLogin);
+
+            HttpContext.Session.SetString(
+                "UsuarioTipo",
+                usuario.Tipo);
+
+            HttpContext.Session.SetInt32(
+                "BarbeariaId",
+                usuario.BarbeariaId);
+
+            if (usuario.BarbeiroId.HasValue)
             {
-                CarregarConfiguracoes();
-
-                usuario.Nome = usuario.UsuarioLogin;
-                usuario.Tipo = "CLIENTE";
-                usuario.BarbeariaId = BarbeariaAtualId;
-
-                ModelState.Remove("Nome");
-                ModelState.Remove("Tipo");
-                ModelState.Remove("Barbearia");
-                ModelState.Remove("BarbeariaId");
-                ModelState.Remove("BarbeiroId");
-                ModelState.Remove("Barbeiro");
-
-                if (!ModelState.IsValid)
-                    return View(usuario);
-
-                bool existe = _context.Usuarios
-                    .Any(u =>
-                        u.UsuarioLogin == usuario.UsuarioLogin &&
-                        u.BarbeariaId == BarbeariaAtualId);
-
-                if (existe)
-                {
-                    ViewBag.Erro = "Este usuário já existe.";
-                    return View(usuario);
-                }
-
-                _context.Usuarios.Add(usuario);
-                _context.SaveChanges();
-
-                TempData["Sucesso"] =
-                    "Cadastro realizado com sucesso. Faça login.";
-
-                return RedirectToAction("Login");
+                HttpContext.Session.SetInt32(
+                    "BarbeiroId",
+                    usuario.BarbeiroId.Value);
             }
 
-            // LOGOUT
-            public IActionResult Sair()
-            {
-                HttpContext.Session.Clear();
+            if (usuario.Tipo == "ADM")
+                return RedirectToAction(
+                    "Index",
+                    "Dashboard");
 
-                return RedirectToAction("Login");
-            }
+            if (usuario.Tipo == "BARBEIRO")
+                return RedirectToAction(
+                    "Index",
+                    "PainelBarbeiro");
 
-            private void CarregarConfiguracoes()
-            {
-                var config = _context.Configuracoes
-                    .FirstOrDefault();
-
-                ViewBag.NomeBarbearia =
-                    config?.NomeBarbearia
-                    ?? "Barbearia Feu Rosa";
-            }
+            return RedirectToAction(
+                "Index",
+                "ClienteHome");
         }
-    }
 
-    // CADASTRO
-    public IActionResult Cadastro()
+        public IActionResult Cadastro()
         {
             CarregarConfiguracoes();
             return View();
@@ -213,12 +127,12 @@ namespace BarbeariaFeuRosa.Controllers
             _context.Usuarios.Add(usuario);
             _context.SaveChanges();
 
-            TempData["Sucesso"] = "Cadastro realizado com sucesso. Faça login.";
+            TempData["Sucesso"] =
+                "Cadastro realizado com sucesso. Faça login.";
 
             return RedirectToAction("Login");
         }
 
-        // LOGOUT
         public IActionResult Sair()
         {
             HttpContext.Session.Clear();
@@ -228,9 +142,12 @@ namespace BarbeariaFeuRosa.Controllers
 
         private void CarregarConfiguracoes()
         {
-            var config = _context.Configuracoes.FirstOrDefault();
+            var config = _context.Configuracoes
+                .FirstOrDefault();
 
-            ViewBag.NomeBarbearia = config?.NomeBarbearia ?? "Barbearia Feu Rosa";
+            ViewBag.NomeBarbearia =
+                config?.NomeBarbearia
+                ?? "Barbearia Feu Rosa";
         }
     }
 }
