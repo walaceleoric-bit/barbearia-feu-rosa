@@ -8,6 +8,8 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
+        private const int BarbeariaAtualId = 1;
+
         public ClientesController(AppDbContext context)
         {
             _context = context;
@@ -16,6 +18,7 @@ namespace BarbeariaFeuRosa.Controllers
         public IActionResult Index()
         {
             var clientes = _context.Clientes
+                .Where(c => c.BarbeariaId == BarbeariaAtualId)
                 .OrderBy(c => c.Nome)
                 .ToList();
 
@@ -30,6 +33,11 @@ namespace BarbeariaFeuRosa.Controllers
         [HttpPost]
         public IActionResult Novo(Cliente cliente)
         {
+            cliente.BarbeariaId = BarbeariaAtualId;
+
+            ModelState.Remove("Barbearia");
+            ModelState.Remove("BarbeariaId");
+
             if (ModelState.IsValid)
             {
                 _context.Clientes.Add(cliente);
@@ -44,7 +52,10 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Editar(int id)
         {
-            var cliente = _context.Clientes.Find(id);
+            var cliente = _context.Clientes
+                .FirstOrDefault(c =>
+                    c.Id == id &&
+                    c.BarbeariaId == BarbeariaAtualId);
 
             if (cliente == null)
             {
@@ -58,6 +69,11 @@ namespace BarbeariaFeuRosa.Controllers
         [HttpPost]
         public IActionResult Editar(Cliente cliente)
         {
+            cliente.BarbeariaId = BarbeariaAtualId;
+
+            ModelState.Remove("Barbearia");
+            ModelState.Remove("BarbeariaId");
+
             if (ModelState.IsValid)
             {
                 _context.Clientes.Update(cliente);
@@ -72,7 +88,10 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Excluir(int id)
         {
-            var cliente = _context.Clientes.Find(id);
+            var cliente = _context.Clientes
+                .FirstOrDefault(c =>
+                    c.Id == id &&
+                    c.BarbeariaId == BarbeariaAtualId);
 
             if (cliente != null)
             {

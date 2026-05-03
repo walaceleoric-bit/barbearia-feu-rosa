@@ -8,6 +8,8 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
+        private const int BarbeariaAtualId = 1;
+
         public AuthController(AppDbContext context)
         {
             _context = context;
@@ -28,7 +30,8 @@ namespace BarbeariaFeuRosa.Controllers
             var usuario = _context.Usuarios
                 .FirstOrDefault(u =>
                     u.UsuarioLogin == usuarioLogin &&
-                    u.Senha == senha);
+                    u.Senha == senha &&
+                    u.BarbeariaId == BarbeariaAtualId);
 
             if (usuario == null)
             {
@@ -39,6 +42,7 @@ namespace BarbeariaFeuRosa.Controllers
             HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
             HttpContext.Session.SetString("UsuarioNome", usuario.UsuarioLogin);
             HttpContext.Session.SetString("UsuarioTipo", usuario.Tipo);
+            HttpContext.Session.SetInt32("BarbeariaId", usuario.BarbeariaId);
 
             if (usuario.BarbeiroId.HasValue)
             {
@@ -68,9 +72,12 @@ namespace BarbeariaFeuRosa.Controllers
 
             usuario.Nome = usuario.UsuarioLogin;
             usuario.Tipo = "CLIENTE";
+            usuario.BarbeariaId = BarbeariaAtualId;
 
             ModelState.Remove("Nome");
             ModelState.Remove("Tipo");
+            ModelState.Remove("Barbearia");
+            ModelState.Remove("BarbeariaId");
             ModelState.Remove("BarbeiroId");
             ModelState.Remove("Barbeiro");
 
@@ -78,7 +85,9 @@ namespace BarbeariaFeuRosa.Controllers
                 return View(usuario);
 
             bool existe = _context.Usuarios
-                .Any(u => u.UsuarioLogin == usuario.UsuarioLogin);
+                .Any(u =>
+                    u.UsuarioLogin == usuario.UsuarioLogin &&
+                    u.BarbeariaId == BarbeariaAtualId);
 
             if (existe)
             {

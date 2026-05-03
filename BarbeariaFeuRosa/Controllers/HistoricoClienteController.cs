@@ -8,6 +8,8 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
+        private const int BarbeariaAtualId = 1;
+
         public HistoricoClienteController(AppDbContext context)
         {
             _context = context;
@@ -23,7 +25,10 @@ namespace BarbeariaFeuRosa.Controllers
             var historico = _context.Agendamentos
                 .Include(a => a.Cliente)
                 .Include(a => a.Barbeiro)
-                .Where(a => a.Cliente.Nome == usuarioNome)
+                .Where(a =>
+                    a.BarbeariaId == BarbeariaAtualId &&
+                    a.Cliente != null &&
+                    a.Cliente.Nome == usuarioNome)
                 .OrderByDescending(a => a.DataHora)
                 .ToList();
 
@@ -39,7 +44,11 @@ namespace BarbeariaFeuRosa.Controllers
 
             var agendamento = _context.Agendamentos
                 .Include(a => a.Cliente)
-                .FirstOrDefault(a => a.Id == id && a.Cliente.Nome == usuarioNome);
+                .FirstOrDefault(a =>
+                    a.Id == id &&
+                    a.BarbeariaId == BarbeariaAtualId &&
+                    a.Cliente != null &&
+                    a.Cliente.Nome == usuarioNome);
 
             if (agendamento != null)
             {
@@ -59,10 +68,14 @@ namespace BarbeariaFeuRosa.Controllers
 
             var historico = _context.Agendamentos
                 .Include(a => a.Cliente)
-                .Where(a => a.Cliente.Nome == usuarioNome)
+                .Where(a =>
+                    a.BarbeariaId == BarbeariaAtualId &&
+                    a.Cliente != null &&
+                    a.Cliente.Nome == usuarioNome)
                 .ToList();
 
             _context.Agendamentos.RemoveRange(historico);
+
             _context.SaveChanges();
 
             return RedirectToAction("Index");

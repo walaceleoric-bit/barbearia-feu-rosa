@@ -8,6 +8,8 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
+        private const int BarbeariaAtualId = 1;
+
         public PainelBarbeiroController(AppDbContext context)
         {
             _context = context;
@@ -24,7 +26,9 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Login", "Auth");
 
             var barbeiro = _context.Barbeiros
-                .FirstOrDefault(x => x.Id == barbeiroId.Value);
+                .FirstOrDefault(x =>
+                    x.Id == barbeiroId.Value &&
+                    x.BarbeariaId == BarbeariaAtualId);
 
             ViewBag.NomeBarbeiro = barbeiro?.Nome ?? "Barbeiro";
             ViewBag.ComissaoPercentual = barbeiro?.ComissaoPercentual ?? 0;
@@ -46,7 +50,9 @@ namespace BarbeariaFeuRosa.Controllers
             var query = _context.Agendamentos
                 .Include(x => x.Cliente)
                 .Include(x => x.Barbeiro)
-                .Where(x => x.BarbeiroId == barbeiroId.Value);
+                .Where(x =>
+                    x.BarbeariaId == BarbeariaAtualId &&
+                    x.BarbeiroId == barbeiroId.Value);
 
             if (filtro == "hoje")
             {
@@ -68,7 +74,9 @@ namespace BarbeariaFeuRosa.Controllers
             var todosAgendamentos = _context.Agendamentos
                 .Include(x => x.Cliente)
                 .Include(x => x.Barbeiro)
-                .Where(x => x.BarbeiroId == barbeiroId.Value)
+                .Where(x =>
+                    x.BarbeariaId == BarbeariaAtualId &&
+                    x.BarbeiroId == barbeiroId.Value)
                 .ToList();
 
             var agendamentosHoje = todosAgendamentos
@@ -137,20 +145,35 @@ namespace BarbeariaFeuRosa.Controllers
             var agendamento = _context.Agendamentos
                 .FirstOrDefault(x =>
                     x.Id == id &&
+                    x.BarbeariaId == BarbeariaAtualId &&
                     x.BarbeiroId == barbeiroId.Value);
 
             if (agendamento == null)
             {
                 TempData["Erro"] = "Agendamento não encontrado.";
-                return RedirectToAction("Index", new { secao = "agenda", filtro = filtroAtual });
+
+                return RedirectToAction(
+                    "Index",
+                    new
+                    {
+                        secao = "agenda",
+                        filtro = filtroAtual
+                    });
             }
 
             agendamento.Status = status;
+
             _context.SaveChanges();
 
             TempData["Sucesso"] = "Status atualizado com sucesso.";
 
-            return RedirectToAction("Index", new { secao = "agenda", filtro = filtroAtual });
+            return RedirectToAction(
+                "Index",
+                new
+                {
+                    secao = "agenda",
+                    filtro = filtroAtual
+                });
         }
     }
 }

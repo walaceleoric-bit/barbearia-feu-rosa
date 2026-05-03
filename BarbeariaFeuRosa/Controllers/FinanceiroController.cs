@@ -8,6 +8,8 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
+        private const int BarbeariaAtualId = 1;
+
         public FinanceiroController(AppDbContext context)
         {
             _context = context;
@@ -15,6 +17,11 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Index()
         {
+            var tipo = HttpContext.Session.GetString("UsuarioTipo");
+
+            if (tipo != "ADM")
+                return RedirectToAction("Login", "Auth");
+
             var hoje = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
             var amanha = hoje.AddDays(1);
 
@@ -28,6 +35,7 @@ namespace BarbeariaFeuRosa.Controllers
             var agendamentos = _context.Agendamentos
                 .Include(a => a.Cliente)
                 .Include(a => a.Barbeiro)
+                .Where(a => a.BarbeariaId == BarbeariaAtualId)
                 .OrderByDescending(a => a.DataHora)
                 .ToList();
 

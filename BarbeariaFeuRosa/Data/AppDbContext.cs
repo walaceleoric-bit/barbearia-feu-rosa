@@ -9,6 +9,8 @@ namespace BarbeariaFeuRosa.Data
         {
         }
 
+        public DbSet<Barbearia> Barbearias { get; set; }
+
         public DbSet<Cliente> Clientes { get; set; }
 
         public DbSet<Configuracao> Configuracoes { get; set; }

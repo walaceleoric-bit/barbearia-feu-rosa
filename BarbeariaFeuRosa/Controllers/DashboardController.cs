@@ -8,6 +8,8 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
+        private const int BarbeariaAtualId = 1;
+
         public DashboardController(AppDbContext context)
         {
             _context = context;
@@ -41,15 +43,21 @@ namespace BarbeariaFeuRosa.Controllers
             var agendamentosHoje = _context.Agendamentos
                 .Include(a => a.Cliente)
                 .Include(a => a.Barbeiro)
-                .Where(a => a.DataHora >= hoje && a.DataHora < amanha)
+                .Where(a =>
+                    a.BarbeariaId == BarbeariaAtualId &&
+                    a.DataHora >= hoje &&
+                    a.DataHora < amanha)
                 .OrderBy(a => a.DataHora)
                 .ToList();
 
-            ViewBag.TotalClientes = _context.Clientes.Count();
+            ViewBag.TotalClientes = _context.Clientes
+                .Count(c => c.BarbeariaId == BarbeariaAtualId);
+
             ViewBag.AgendamentosHoje = agendamentosHoje.Count;
 
             ViewBag.FaturamentoHoje = _context.Agendamentos
                 .Where(a =>
+                    a.BarbeariaId == BarbeariaAtualId &&
                     a.Status == "Finalizado" &&
                     a.DataHora >= hoje &&
                     a.DataHora < amanha)
@@ -58,6 +66,7 @@ namespace BarbeariaFeuRosa.Controllers
 
             ViewBag.FaturamentoMes = _context.Agendamentos
                 .Where(a =>
+                    a.BarbeariaId == BarbeariaAtualId &&
                     a.Status == "Finalizado" &&
                     a.DataHora >= primeiroDiaMes &&
                     a.DataHora < primeiroDiaProximoMes)

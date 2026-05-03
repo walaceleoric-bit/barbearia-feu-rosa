@@ -6,6 +6,10 @@ namespace BarbeariaFeuRosa.Models
     {
         public int Id { get; set; }
 
+        public int BarbeariaId { get; set; } = 1;
+
+        public Barbearia? Barbearia { get; set; }
+
         [Required]
         public int ClienteId { get; set; }
 

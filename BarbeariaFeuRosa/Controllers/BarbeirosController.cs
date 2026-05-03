@@ -8,6 +8,8 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
+        private const int BarbeariaAtualId = 1;
+
         public BarbeirosController(AppDbContext context)
         {
             _context = context;
@@ -16,6 +18,7 @@ namespace BarbeariaFeuRosa.Controllers
         public IActionResult Index()
         {
             var barbeiros = _context.Barbeiros
+                .Where(b => b.BarbeariaId == BarbeariaAtualId)
                 .OrderBy(b => b.Nome)
                 .ToList();
 
@@ -30,33 +33,30 @@ namespace BarbeariaFeuRosa.Controllers
         [HttpPost]
         public IActionResult Novo(Barbeiro barbeiro, string usuarioLogin, string senha)
         {
+            barbeiro.BarbeariaId = BarbeariaAtualId;
+
+            ModelState.Remove("Barbearia");
+            ModelState.Remove("BarbeariaId");
+
             if (string.IsNullOrWhiteSpace(usuarioLogin))
-            {
                 ModelState.AddModelError("", "Informe o usuário de login do barbeiro.");
-            }
 
             if (string.IsNullOrWhiteSpace(senha))
-            {
                 ModelState.AddModelError("", "Informe a senha do barbeiro.");
-            }
 
             if (!string.IsNullOrWhiteSpace(senha) && senha.Length > 6)
-            {
                 ModelState.AddModelError("", "A senha deve ter no máximo 6 caracteres.");
-            }
 
             bool usuarioJaExiste = _context.Usuarios
-                .Any(u => u.UsuarioLogin == usuarioLogin);
+                .Any(u =>
+                    u.UsuarioLogin == usuarioLogin &&
+                    u.BarbeariaId == BarbeariaAtualId);
 
             if (usuarioJaExiste)
-            {
                 ModelState.AddModelError("", "Este usuário de login já existe.");
-            }
 
             if (!ModelState.IsValid)
-            {
                 return View(barbeiro);
-            }
 
             _context.Barbeiros.Add(barbeiro);
             _context.SaveChanges();
@@ -67,6 +67,7 @@ namespace BarbeariaFeuRosa.Controllers
                 UsuarioLogin = usuarioLogin,
                 Senha = senha,
                 Tipo = "BARBEIRO",
+                BarbeariaId = BarbeariaAtualId,
                 BarbeiroId = barbeiro.Id
             };
 
@@ -80,7 +81,10 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Editar(int id)
         {
-            var barbeiro = _context.Barbeiros.Find(id);
+            var barbeiro = _context.Barbeiros
+                .FirstOrDefault(b =>
+                    b.Id == id &&
+                    b.BarbeariaId == BarbeariaAtualId);
 
             if (barbeiro == null)
             {
@@ -94,6 +98,11 @@ namespace BarbeariaFeuRosa.Controllers
         [HttpPost]
         public IActionResult Editar(Barbeiro barbeiro)
         {
+            barbeiro.BarbeariaId = BarbeariaAtualId;
+
+            ModelState.Remove("Barbearia");
+            ModelState.Remove("BarbeariaId");
+
             if (ModelState.IsValid)
             {
                 _context.Barbeiros.Update(barbeiro);
@@ -108,17 +117,20 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Excluir(int id)
         {
-            var barbeiro = _context.Barbeiros.Find(id);
+            var barbeiro = _context.Barbeiros
+                .FirstOrDefault(b =>
+                    b.Id == id &&
+                    b.BarbeariaId == BarbeariaAtualId);
 
             if (barbeiro != null)
             {
                 var usuario = _context.Usuarios
-                    .FirstOrDefault(u => u.BarbeiroId == barbeiro.Id);
+                    .FirstOrDefault(u =>
+                        u.BarbeiroId == barbeiro.Id &&
+                        u.BarbeariaId == BarbeariaAtualId);
 
                 if (usuario != null)
-                {
                     _context.Usuarios.Remove(usuario);
-                }
 
                 _context.Barbeiros.Remove(barbeiro);
                 _context.SaveChanges();

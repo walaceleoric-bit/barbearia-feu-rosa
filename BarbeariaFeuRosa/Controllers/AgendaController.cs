@@ -10,6 +10,8 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
+        private const int BarbeariaAtualId = 1;
+
         public AgendaController(AppDbContext context)
         {
             _context = context;
@@ -20,6 +22,7 @@ namespace BarbeariaFeuRosa.Controllers
             var agendamentos = _context.Agendamentos
                 .Include(a => a.Cliente)
                 .Include(a => a.Barbeiro)
+                .Where(a => a.BarbeariaId == BarbeariaAtualId)
                 .OrderBy(a => a.DataHora)
                 .ToList();
 
@@ -35,15 +38,21 @@ namespace BarbeariaFeuRosa.Controllers
         [HttpPost]
         public IActionResult Novo(Agendamento agendamento)
         {
+            agendamento.BarbeariaId = BarbeariaAtualId;
+
             ModelState.Remove("Cliente");
             ModelState.Remove("Barbeiro");
+            ModelState.Remove("Barbearia");
+            ModelState.Remove("BarbeariaId");
 
             if (ModelState.IsValid)
             {
                 agendamento.Status = "Agendado";
 
-                // Corrige data para o PostgreSQL
-                agendamento.DataHora = DateTime.SpecifyKind(agendamento.DataHora, DateTimeKind.Utc);
+                agendamento.DataHora = DateTime.SpecifyKind(
+                    agendamento.DataHora,
+                    DateTimeKind.Utc
+                );
 
                 _context.Agendamentos.Add(agendamento);
                 _context.SaveChanges();
@@ -58,7 +67,10 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Excluir(int id)
         {
-            var agendamento = _context.Agendamentos.Find(id);
+            var agendamento = _context.Agendamentos
+                .FirstOrDefault(a =>
+                    a.Id == id &&
+                    a.BarbeariaId == BarbeariaAtualId);
 
             if (agendamento != null)
             {
@@ -74,13 +86,19 @@ namespace BarbeariaFeuRosa.Controllers
         private void CarregarCombos()
         {
             ViewBag.Clientes = new SelectList(
-                _context.Clientes.OrderBy(c => c.Nome),
+                _context.Clientes
+                    .Where(c => c.BarbeariaId == BarbeariaAtualId)
+                    .OrderBy(c => c.Nome),
                 "Id",
                 "Nome"
             );
 
             ViewBag.Barbeiros = new SelectList(
-                _context.Barbeiros.Where(b => b.Ativo).OrderBy(b => b.Nome),
+                _context.Barbeiros
+                    .Where(b =>
+                        b.BarbeariaId == BarbeariaAtualId &&
+                        b.Ativo)
+                    .OrderBy(b => b.Nome),
                 "Id",
                 "Nome"
             );
