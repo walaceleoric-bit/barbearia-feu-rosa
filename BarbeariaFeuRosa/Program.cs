@@ -26,8 +26,7 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    var barbearia = context.Barbearias
-        .FirstOrDefault(b => b.Id == 1);
+    var barbearia = context.Barbearias.FirstOrDefault(b => b.Id == 1);
 
     if (barbearia == null)
     {
@@ -37,7 +36,8 @@ using (var scope = app.Services.CreateScope())
             Nome = "Barbearia Feu Rosa",
             Slug = "feu-rosa",
             LogoUrl = "",
-            Ativa = true
+            Ativa = true,
+            PagamentoEmDia = true
         });
 
         context.SaveChanges();
@@ -77,17 +77,46 @@ app.UseRouting();
 
 app.UseSession();
 
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value?.ToLower() ?? "";
+
+    bool rotaLivre =
+        path.StartsWith("/auth") ||
+        path.StartsWith("/superadmin") ||
+        path.StartsWith("/css") ||
+        path.StartsWith("/js") ||
+        path.StartsWith("/lib") ||
+        path.StartsWith("/uploads");
+
+    if (!rotaLivre)
+    {
+        var barbeariaId = context.Session.GetInt32("BarbeariaId");
+        var superAdmin = context.Session.GetString("SuperAdmin");
+
+        if (superAdmin != "SIM" && barbeariaId.HasValue)
+        {
+            using var scope = context.RequestServices.CreateScope();
+
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            var barbearia = db.Barbearias
+                .FirstOrDefault(b => b.Id == barbeariaId.Value);
+
+            if (barbearia == null || !barbearia.Ativa || !barbearia.PagamentoEmDia)
+            {
+                context.Session.Clear();
+                context.Response.Redirect("/Auth/Login?bloqueado=1");
+                return;
+            }
+        }
+    }
+
+    await next();
+});
+
 app.UseAuthorization();
 
-/*
-    ROTA FUTURA DO SAAS:
-    Exemplo:
-    /feu-rosa/Auth/Login
-    /feu-rosa/Dashboard
-    /feu-rosa/Clientes
-
-    Por enquanto ela já existe, mas os controllers ainda estão usando BarbeariaId = 1.
-*/
 app.MapControllerRoute(
     name: "tenant",
     pattern: "{barbeariaSlug}/{controller=Auth}/{action=Login}/{id?}");

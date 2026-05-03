@@ -18,6 +18,10 @@ namespace BarbeariaFeuRosa.Controllers
         public IActionResult Login()
         {
             CarregarConfiguracoes();
+
+            if (TempData["Bloqueio"] != null)
+                ViewBag.Erro = TempData["Bloqueio"];
+
             return View();
         }
 
@@ -26,16 +30,19 @@ namespace BarbeariaFeuRosa.Controllers
         {
             CarregarConfiguracoes();
 
-            // SUPER ADMIN
             if (usuarioLogin == "dono" && senha == "123456")
             {
-                HttpContext.Session.SetString(
-                    "SuperAdmin",
-                    "SIM");
+                HttpContext.Session.SetString("SuperAdmin", "SIM");
+                return RedirectToAction("Index", "SuperAdmin");
+            }
 
-                return RedirectToAction(
-                    "Index",
-                    "SuperAdmin");
+            var barbearia = _context.Barbearias
+                .FirstOrDefault(b => b.Id == BarbeariaAtualId);
+
+            if (barbearia == null || !barbearia.Ativa || !barbearia.PagamentoEmDia)
+            {
+                ViewBag.Erro = "Sistema bloqueado. Entre em contato com o administrador.";
+                return View();
             }
 
             var usuario = _context.Usuarios
@@ -50,42 +57,21 @@ namespace BarbeariaFeuRosa.Controllers
                 return View();
             }
 
-            HttpContext.Session.SetInt32(
-                "UsuarioId",
-                usuario.Id);
-
-            HttpContext.Session.SetString(
-                "UsuarioNome",
-                usuario.UsuarioLogin);
-
-            HttpContext.Session.SetString(
-                "UsuarioTipo",
-                usuario.Tipo);
-
-            HttpContext.Session.SetInt32(
-                "BarbeariaId",
-                usuario.BarbeariaId);
+            HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
+            HttpContext.Session.SetString("UsuarioNome", usuario.UsuarioLogin);
+            HttpContext.Session.SetString("UsuarioTipo", usuario.Tipo);
+            HttpContext.Session.SetInt32("BarbeariaId", usuario.BarbeariaId);
 
             if (usuario.BarbeiroId.HasValue)
-            {
-                HttpContext.Session.SetInt32(
-                    "BarbeiroId",
-                    usuario.BarbeiroId.Value);
-            }
+                HttpContext.Session.SetInt32("BarbeiroId", usuario.BarbeiroId.Value);
 
             if (usuario.Tipo == "ADM")
-                return RedirectToAction(
-                    "Index",
-                    "Dashboard");
+                return RedirectToAction("Index", "Dashboard");
 
             if (usuario.Tipo == "BARBEIRO")
-                return RedirectToAction(
-                    "Index",
-                    "PainelBarbeiro");
+                return RedirectToAction("Index", "PainelBarbeiro");
 
-            return RedirectToAction(
-                "Index",
-                "ClienteHome");
+            return RedirectToAction("Index", "ClienteHome");
         }
 
         public IActionResult Cadastro()
@@ -98,6 +84,15 @@ namespace BarbeariaFeuRosa.Controllers
         public IActionResult Cadastro(Usuario usuario)
         {
             CarregarConfiguracoes();
+
+            var barbearia = _context.Barbearias
+                .FirstOrDefault(b => b.Id == BarbeariaAtualId);
+
+            if (barbearia == null || !barbearia.Ativa || !barbearia.PagamentoEmDia)
+            {
+                ViewBag.Erro = "Sistema bloqueado. Cadastro indisponível.";
+                return View(usuario);
+            }
 
             usuario.Nome = usuario.UsuarioLogin;
             usuario.Tipo = "CLIENTE";
@@ -127,8 +122,7 @@ namespace BarbeariaFeuRosa.Controllers
             _context.Usuarios.Add(usuario);
             _context.SaveChanges();
 
-            TempData["Sucesso"] =
-                "Cadastro realizado com sucesso. Faça login.";
+            TempData["Sucesso"] = "Cadastro realizado com sucesso. Faça login.";
 
             return RedirectToAction("Login");
         }
@@ -136,18 +130,15 @@ namespace BarbeariaFeuRosa.Controllers
         public IActionResult Sair()
         {
             HttpContext.Session.Clear();
-
             return RedirectToAction("Login");
         }
 
         private void CarregarConfiguracoes()
         {
-            var config = _context.Configuracoes
-                .FirstOrDefault();
+            var config = _context.Configuracoes.FirstOrDefault();
 
             ViewBag.NomeBarbearia =
-                config?.NomeBarbearia
-                ?? "Barbearia Feu Rosa";
+                config?.NomeBarbearia ?? "Barbearia Feu Rosa";
         }
     }
 }
