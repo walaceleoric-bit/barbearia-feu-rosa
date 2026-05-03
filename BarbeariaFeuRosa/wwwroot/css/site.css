@@ -275,3 +275,53 @@ textarea {
         font-size: 12px;
     }
 }
+/* ===========================
+   FORÇAR TEXTOS CLAROS
+=========================== */
+
+p,
+small,
+span,
+label,
+strong,
+td,
+th,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #ffffff !important;
+}
+
+
+/* textos muted do bootstrap */
+.text-muted {
+    color: #d8d8d8 !important;
+}
+
+
+/* textos dentro dos cards */
+.card p,
+.card small,
+.card span,
+.card label,
+.card div {
+    color: #ffffff !important;
+}
+
+
+/* tabelas */
+.table td,
+.table th {
+    color: white !important;
+}
+
+
+/* placeholders dos inputs */
+::placeholder {
+    color: #d0d0d0 !important;
+    opacity: 1;
+}
