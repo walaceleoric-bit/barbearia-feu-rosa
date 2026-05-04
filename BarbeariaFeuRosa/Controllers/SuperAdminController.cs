@@ -161,6 +161,36 @@ namespace BarbeariaFeuRosa.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Excluir(int id)
+        {
+            if (HttpContext.Session.GetString("SuperAdmin") != "SIM")
+                return RedirectToAction("Login");
+
+            var barbearia = _context.Barbearias.Find(id);
+
+            if (barbearia == null)
+            {
+                TempData["Erro"] = "Barbearia não encontrada.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                _context.Barbearias.Remove(barbearia);
+                _context.SaveChanges();
+
+                TempData["Sucesso"] = "Barbearia excluída com sucesso!";
+            }
+            catch
+            {
+                TempData["Erro"] = "Não foi possível excluir esta barbearia porque existem dados vinculados a ela, como clientes, barbeiros, agendamentos ou financeiro.";
+            }
+
+            return RedirectToAction("Index");
+        }
+
         public IActionResult Sair()
         {
             HttpContext.Session.Remove("SuperAdmin");
