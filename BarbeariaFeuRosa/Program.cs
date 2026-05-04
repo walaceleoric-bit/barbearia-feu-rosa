@@ -87,29 +87,46 @@ app.Use(async (context, next) =>
         path.StartsWith("/css") ||
         path.StartsWith("/js") ||
         path.StartsWith("/lib") ||
-        path.StartsWith("/uploads");
+        path.StartsWith("/uploads") ||
+        path.StartsWith("/favicon");
 
-    if (!rotaLivre)
+    if (rotaLivre)
     {
-        var barbeariaId = context.Session.GetInt32("BarbeariaId");
-        var superAdmin = context.Session.GetString("SuperAdmin");
+        await next();
+        return;
+    }
 
-        if (superAdmin != "SIM" && barbeariaId.HasValue)
-        {
-            using var scope = context.RequestServices.CreateScope();
+    var superAdmin = context.Session.GetString("SuperAdmin");
 
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (superAdmin == "SIM")
+    {
+        await next();
+        return;
+    }
 
-            var barbearia = db.Barbearias
-                .FirstOrDefault(b => b.Id == barbeariaId.Value);
+    var usuarioTipo = context.Session.GetString("UsuarioTipo");
+    var barbeariaId = context.Session.GetInt32("BarbeariaId");
 
-            if (barbearia == null || !barbearia.Ativa || !barbearia.PagamentoEmDia)
-            {
-                context.Session.Clear();
-                context.Response.Redirect("/Auth/Login?bloqueado=1");
-                return;
-            }
-        }
+    if (string.IsNullOrEmpty(usuarioTipo) || !barbeariaId.HasValue)
+    {
+        await next();
+        return;
+    }
+
+    using var scopeBloqueio = context.RequestServices.CreateScope();
+
+    var db = scopeBloqueio.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    var barbeariaLogada = db.Barbearias
+        .FirstOrDefault(b => b.Id == barbeariaId.Value);
+
+    if (barbeariaLogada == null ||
+        !barbeariaLogada.Ativa ||
+        !barbeariaLogada.PagamentoEmDia)
+    {
+        context.Session.Clear();
+        context.Response.Redirect("/Auth/Login");
+        return;
     }
 
     await next();
