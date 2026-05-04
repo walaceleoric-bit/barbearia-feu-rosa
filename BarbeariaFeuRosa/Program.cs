@@ -135,10 +135,6 @@ app.Use(async (context, next) =>
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "tenant",
-    pattern: "{barbeariaSlug}/{controller=Auth}/{action=Login}/{id?}");
-
-app.MapControllerRoute(
     name: "agenda",
     pattern: "Agenda/{action=Index}/{id?}",
     defaults: new { controller = "Agenda" });
@@ -197,6 +193,10 @@ app.MapControllerRoute(
     name: "home",
     pattern: "Home/{action=Index}/{id?}",
     defaults: new { controller = "Home" });
+
+app.MapControllerRoute(
+    name: "tenant",
+    pattern: "{barbeariaSlug}/{controller=Auth}/{action=Login}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
