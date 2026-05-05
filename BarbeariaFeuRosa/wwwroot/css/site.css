@@ -109,39 +109,55 @@ textarea {
    BOTÕES
 =========================== */
 
+/* ===========================
+   BOTÕES
+=========================== */
+
 .btn {
     border-radius: 10px;
     font-weight: 600;
+    color: #ffffff !important;
 }
+
+    .btn:hover {
+        color: #ffffff !important;
+    }
 
 .btn-dark {
     background: #152019;
     border-color: #223228;
+    color: #ffffff !important;
 }
 
     .btn-dark:hover {
         background: #203126;
+        color: #ffffff !important;
     }
 
 .btn-success {
     background: #228b4f;
     border-color: #228b4f;
+    color: #ffffff !important;
 }
 
     .btn-success:hover {
         background: #2ca45d;
+        color: #ffffff !important;
     }
 
 .btn-primary {
     background: #1c6cd6;
+    color: #ffffff !important;
 }
 
 .btn-danger {
     background: #c43a3a;
+    color: #ffffff !important;
 }
 
 .btn-warning {
-    color: black;
+    background: #d9a400;
+    color: #ffffff !important;
 }
 
 
@@ -310,7 +326,7 @@ h6 {
 .card label,
 .card div {
     color: #ffffff !important;
-}
+}-
 
 
 /* tabelas */
