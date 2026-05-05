@@ -341,3 +341,104 @@ h6 {
     color: #d0d0d0 !important;
     opacity: 1;
 }
+/* ===========================
+   UPGRADE VISUAL PREMIUM
+=========================== */
+
+/* fundo com profundidade */
+body {
+    background: radial-gradient(circle at top right, rgba(34,139,79,.08), transparent 35%), radial-gradient(circle at bottom left, rgba(34,139,79,.05), transparent 30%), #0d1110;
+}
+
+
+/* cards premium */
+.card {
+    transition: .25s ease;
+    backdrop-filter: blur(8px);
+}
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0,0,0,.35), 0 0 0 1px rgba(80,255,140,.08);
+    }
+
+
+/* botões premium */
+.btn {
+    transition: .2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,.20);
+}
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(0,0,0,.30);
+    }
+
+
+/* inputs premium */
+.form-control,
+.form-select,
+input,
+select,
+textarea {
+    transition: .2s ease;
+}
+
+    .form-control:hover,
+    .form-select:hover,
+    input:hover,
+    select:hover,
+    textarea:hover {
+        border-color: #4fd97e !important;
+    }
+
+
+/* tabelas premium */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+    .table tbody tr {
+        transition: .15s ease;
+    }
+
+        .table tbody tr:hover {
+            transform: scale(1.003);
+        }
+
+
+/* menu premium */
+.bg-dark a {
+    font-weight: 500;
+}
+
+    .bg-dark a:hover {
+        transform: translateX(4px);
+    }
+
+
+/* títulos */
+h1, h2, h3 {
+    letter-spacing: .3px;
+}
+
+
+/* animação de entrada */
+.card,
+.table,
+.btn {
+    animation: fadeUp .35s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
