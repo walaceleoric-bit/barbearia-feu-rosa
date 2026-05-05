@@ -19,12 +19,16 @@ namespace BarbeariaFeuRosa.Models
         [Required]
         public string Tipo { get; set; } = "CLIENTE";
 
-        public int BarbeariaId { get; set; } = 1;
+        public int BarbeariaId { get; set; }
 
         public Barbearia? Barbearia { get; set; }
 
         public int? BarbeiroId { get; set; }
 
         public Barbeiro? Barbeiro { get; set; }
+
+        public int? ClienteId { get; set; }
+
+        public Cliente? Cliente { get; set; }
     }
 }

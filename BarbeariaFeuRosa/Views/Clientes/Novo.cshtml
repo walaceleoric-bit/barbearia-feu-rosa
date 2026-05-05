@@ -16,11 +16,19 @@
 
     <hr />
 
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            Verifique os campos abaixo.
+        </div>
+    }
+
     <form method="post">
 
         <div class="mb-3">
             <label>Nome</label>
             <input asp-for="Nome" class="form-control" />
+            <span asp-validation-for="Nome" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -30,10 +38,34 @@
                    class="form-control"
                    inputmode="numeric"
                    placeholder="(00) 00000-0000" />
+            <span asp-validation-for="WhatsApp" class="text-danger"></span>
+        </div>
+
+        <hr />
+
+        <h5>Login do Cliente</h5>
+
+        <div class="mb-3">
+            <label>Usuário/Login</label>
+            <input name="usuarioLogin"
+                   class="form-control"
+                   required
+                   placeholder="Exemplo: bianca" />
+        </div>
+
+        <div class="mb-3">
+            <label>Senha</label>
+            <input name="senha"
+                   type="password"
+                   maxlength="6"
+                   inputmode="numeric"
+                   class="form-control"
+                   required
+                   placeholder="Máximo 6 dígitos" />
         </div>
 
         <button type="submit" class="btn btn-dark">
-            Salvar
+            Salvar Cliente e Login
         </button>
 
     </form>
