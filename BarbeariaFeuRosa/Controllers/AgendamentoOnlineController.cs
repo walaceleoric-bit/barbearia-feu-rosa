@@ -9,11 +9,14 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
-        private const int BarbeariaAtualId = 1;
-
         public AgendamentoOnlineController(AppDbContext context)
         {
             _context = context;
+        }
+
+        private int? ObterBarbeariaId()
+        {
+            return HttpContext.Session.GetInt32("BarbeariaId");
         }
 
         public IActionResult Index()
@@ -21,7 +24,12 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "CLIENTE")
                 return RedirectToAction("Login", "Auth");
 
-            CarregarCombos();
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+            CarregarCombos(barbeariaId.Value);
 
             return View();
         }
@@ -32,18 +40,23 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "CLIENTE")
                 return RedirectToAction("Login", "Auth");
 
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var usuarioNome = HttpContext.Session.GetString("UsuarioNome") ?? "Cliente";
 
             var cliente = _context.Clientes
                 .FirstOrDefault(c =>
                     c.Nome == usuarioNome &&
-                    c.BarbeariaId == BarbeariaAtualId);
+                    c.BarbeariaId == barbeariaId.Value);
 
             if (cliente == null)
             {
                 cliente = new Cliente
                 {
-                    BarbeariaId = BarbeariaAtualId,
+                    BarbeariaId = barbeariaId.Value,
                     Nome = usuarioNome,
                     WhatsApp = ""
                 };
@@ -55,13 +68,13 @@ namespace BarbeariaFeuRosa.Controllers
             var barbeiroExiste = _context.Barbeiros
                 .Any(b =>
                     b.Id == barbeiroId &&
-                    b.BarbeariaId == BarbeariaAtualId &&
+                    b.BarbeariaId == barbeariaId.Value &&
                     b.Ativo);
 
             if (!barbeiroExiste)
             {
                 TempData["Erro"] = "Barbeiro inválido.";
-                CarregarCombos();
+                CarregarCombos(barbeariaId.Value);
                 return View();
             }
 
@@ -76,7 +89,7 @@ namespace BarbeariaFeuRosa.Controllers
 
             var agendamento = new Agendamento
             {
-                BarbeariaId = BarbeariaAtualId,
+                BarbeariaId = barbeariaId.Value,
                 ClienteId = cliente.Id,
                 BarbeiroId = barbeiroId,
                 Servico = servico,
@@ -93,12 +106,12 @@ namespace BarbeariaFeuRosa.Controllers
             return RedirectToAction("Index", "HistoricoCliente");
         }
 
-        private void CarregarCombos()
+        private void CarregarCombos(int barbeariaId)
         {
             ViewBag.Barbeiros = new SelectList(
                 _context.Barbeiros
                     .Where(b =>
-                        b.BarbeariaId == BarbeariaAtualId &&
+                        b.BarbeariaId == barbeariaId &&
                         b.Ativo)
                     .OrderBy(b => b.Nome),
                 "Id",

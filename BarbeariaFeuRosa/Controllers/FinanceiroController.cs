@@ -8,18 +8,24 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
-        private const int BarbeariaAtualId = 1;
-
         public FinanceiroController(AppDbContext context)
         {
             _context = context;
         }
 
+        private int? ObterBarbeariaId()
+        {
+            return HttpContext.Session.GetInt32("BarbeariaId");
+        }
+
         public IActionResult Index()
         {
-            var tipo = HttpContext.Session.GetString("UsuarioTipo");
+            if (HttpContext.Session.GetString("UsuarioTipo") != "ADM")
+                return RedirectToAction("Login", "Auth");
 
-            if (tipo != "ADM")
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
                 return RedirectToAction("Login", "Auth");
 
             var hoje = DateTime.SpecifyKind(DateTime.Today, DateTimeKind.Utc);
@@ -35,7 +41,7 @@ namespace BarbeariaFeuRosa.Controllers
             var agendamentos = _context.Agendamentos
                 .Include(a => a.Cliente)
                 .Include(a => a.Barbeiro)
-                .Where(a => a.BarbeariaId == BarbeariaAtualId)
+                .Where(a => a.BarbeariaId == barbeariaId.Value)
                 .OrderByDescending(a => a.DataHora)
                 .ToList();
 
@@ -49,7 +55,9 @@ namespace BarbeariaFeuRosa.Controllers
                 .ToString("C");
 
             ViewBag.FaturamentoMes = finalizados
-                .Where(a => a.DataHora >= primeiroDiaMes && a.DataHora < primeiroDiaProximoMes)
+                .Where(a =>
+                    a.DataHora >= primeiroDiaMes &&
+                    a.DataHora < primeiroDiaProximoMes)
                 .Sum(a => a.Valor)
                 .ToString("C");
 

@@ -8,16 +8,16 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
-        private const int BarbeariaAtualId = 1;
-
         public AuthController(AppDbContext context)
         {
             _context = context;
         }
 
-        public IActionResult Login()
+        public IActionResult Login(string? barbeariaSlug)
         {
-            CarregarConfiguracoes();
+            var slugAtual = ObterSlugAtual(barbeariaSlug);
+
+            CarregarConfiguracoes(slugAtual);
 
             if (TempData["Bloqueio"] != null)
                 ViewBag.Erro = TempData["Bloqueio"];
@@ -26,9 +26,11 @@ namespace BarbeariaFeuRosa.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string usuarioLogin, string senha)
+        public IActionResult Login(string usuarioLogin, string senha, string? barbeariaSlug)
         {
-            CarregarConfiguracoes();
+            var slugAtual = ObterSlugAtual(barbeariaSlug);
+
+            CarregarConfiguracoes(slugAtual);
 
             if (usuarioLogin == "dono" && senha == "123456")
             {
@@ -36,20 +38,46 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Index", "SuperAdmin");
             }
 
-            var barbearia = _context.Barbearias
-                .FirstOrDefault(b => b.Id == BarbeariaAtualId);
+            Barbearia? barbearia = null;
 
-            if (barbearia == null || !barbearia.Ativa || !barbearia.PagamentoEmDia)
+            if (!string.IsNullOrWhiteSpace(slugAtual))
             {
-                ViewBag.Erro = "Sistema bloqueado. Entre em contato com o administrador.";
-                return View();
+                barbearia = _context.Barbearias
+                    .FirstOrDefault(b => b.Slug.ToLower() == slugAtual.ToLower());
+
+                if (barbearia == null)
+                {
+                    ViewBag.Erro = "Barbearia não encontrada.";
+                    return View();
+                }
+
+                if (!barbearia.Ativa || !barbearia.PagamentoEmDia)
+                {
+                    ViewBag.Erro = "Sistema bloqueado. Entre em contato com o administrador.";
+                    return View();
+                }
+
+                var usuarioComSlug = _context.Usuarios
+                    .FirstOrDefault(u =>
+                        u.UsuarioLogin == usuarioLogin &&
+                        u.Senha == senha &&
+                        u.BarbeariaId == barbearia.Id);
+
+                if (usuarioComSlug == null)
+                {
+                    ViewBag.Erro = "Usuário ou senha inválidos.";
+                    return View();
+                }
+
+                SalvarSessao(usuarioComSlug, barbearia);
+
+                return RedirecionarPorTipo(usuarioComSlug);
             }
 
             var usuario = _context.Usuarios
                 .FirstOrDefault(u =>
                     u.UsuarioLogin == usuarioLogin &&
-                    u.Senha == senha &&
-                    u.BarbeariaId == BarbeariaAtualId);
+                    u.Senha == senha);
 
             if (usuario == null)
             {
@@ -57,38 +85,58 @@ namespace BarbeariaFeuRosa.Controllers
                 return View();
             }
 
-            HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
-            HttpContext.Session.SetString("UsuarioNome", usuario.UsuarioLogin);
-            HttpContext.Session.SetString("UsuarioTipo", usuario.Tipo);
-            HttpContext.Session.SetInt32("BarbeariaId", usuario.BarbeariaId);
+            barbearia = _context.Barbearias
+                .FirstOrDefault(b => b.Id == usuario.BarbeariaId);
 
-            if (usuario.BarbeiroId.HasValue)
-                HttpContext.Session.SetInt32("BarbeiroId", usuario.BarbeiroId.Value);
+            if (barbearia == null)
+            {
+                ViewBag.Erro = "Barbearia não encontrada para este usuário.";
+                return View();
+            }
 
-            if (usuario.Tipo == "ADM")
-                return RedirectToAction("Index", "Dashboard");
+            if (!barbearia.Ativa || !barbearia.PagamentoEmDia)
+            {
+                ViewBag.Erro = "Sistema bloqueado. Entre em contato com o administrador.";
+                return View();
+            }
 
-            if (usuario.Tipo == "BARBEIRO")
-                return RedirectToAction("Index", "PainelBarbeiro");
+            SalvarSessao(usuario, barbearia);
 
-            return RedirectToAction("Index", "ClienteHome");
+            return RedirecionarPorTipo(usuario);
         }
 
-        public IActionResult Cadastro()
+        public IActionResult Cadastro(string? barbeariaSlug)
         {
-            CarregarConfiguracoes();
+            var slugAtual = ObterSlugAtual(barbeariaSlug);
+
+            CarregarConfiguracoes(slugAtual);
+
             return View();
         }
 
         [HttpPost]
-        public IActionResult Cadastro(Usuario usuario)
+        public IActionResult Cadastro(Usuario usuario, string? barbeariaSlug)
         {
-            CarregarConfiguracoes();
+            var slugAtual = ObterSlugAtual(barbeariaSlug);
+
+            CarregarConfiguracoes(slugAtual);
+
+            if (string.IsNullOrWhiteSpace(slugAtual))
+            {
+                ViewBag.Erro = "Acesse o cadastro pela URL da barbearia.";
+                return View(usuario);
+            }
 
             var barbearia = _context.Barbearias
-                .FirstOrDefault(b => b.Id == BarbeariaAtualId);
+                .FirstOrDefault(b => b.Slug.ToLower() == slugAtual.ToLower());
 
-            if (barbearia == null || !barbearia.Ativa || !barbearia.PagamentoEmDia)
+            if (barbearia == null)
+            {
+                ViewBag.Erro = "Barbearia não encontrada.";
+                return View(usuario);
+            }
+
+            if (!barbearia.Ativa || !barbearia.PagamentoEmDia)
             {
                 ViewBag.Erro = "Sistema bloqueado. Cadastro indisponível.";
                 return View(usuario);
@@ -96,7 +144,7 @@ namespace BarbeariaFeuRosa.Controllers
 
             usuario.Nome = usuario.UsuarioLogin;
             usuario.Tipo = "CLIENTE";
-            usuario.BarbeariaId = BarbeariaAtualId;
+            usuario.BarbeariaId = barbearia.Id;
 
             ModelState.Remove("Nome");
             ModelState.Remove("Tipo");
@@ -111,11 +159,11 @@ namespace BarbeariaFeuRosa.Controllers
             bool existe = _context.Usuarios
                 .Any(u =>
                     u.UsuarioLogin == usuario.UsuarioLogin &&
-                    u.BarbeariaId == BarbeariaAtualId);
+                    u.BarbeariaId == barbearia.Id);
 
             if (existe)
             {
-                ViewBag.Erro = "Este usuário já existe.";
+                ViewBag.Erro = "Este usuário já existe nesta barbearia.";
                 return View(usuario);
             }
 
@@ -124,21 +172,71 @@ namespace BarbeariaFeuRosa.Controllers
 
             TempData["Sucesso"] = "Cadastro realizado com sucesso. Faça login.";
 
-            return RedirectToAction("Login");
+            return Redirect($"/{barbearia.Slug}/Auth/Login");
         }
 
         public IActionResult Sair()
         {
+            var slug = HttpContext.Session.GetString("BarbeariaSlug");
+
             HttpContext.Session.Clear();
+
+            if (!string.IsNullOrWhiteSpace(slug))
+                return Redirect($"/{slug}/Auth/Login");
+
             return RedirectToAction("Login");
         }
 
-        private void CarregarConfiguracoes()
+        private string ObterSlugAtual(string? barbeariaSlug)
         {
-            var config = _context.Configuracoes.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(barbeariaSlug))
+                return barbeariaSlug.Trim().ToLower();
 
-            ViewBag.NomeBarbearia =
-                config?.NomeBarbearia ?? "Barbearia Feu Rosa";
+            var slugRota = RouteData.Values["barbeariaSlug"]?.ToString();
+
+            if (!string.IsNullOrWhiteSpace(slugRota))
+                return slugRota.Trim().ToLower();
+
+            return "";
+        }
+
+        private void CarregarConfiguracoes(string slugAtual)
+        {
+            ViewBag.BarbeariaSlug = slugAtual;
+
+            if (!string.IsNullOrWhiteSpace(slugAtual))
+            {
+                var barbearia = _context.Barbearias
+                    .FirstOrDefault(b => b.Slug.ToLower() == slugAtual.ToLower());
+
+                ViewBag.NomeBarbearia = barbearia?.Nome ?? "Barbearia Universo";
+                return;
+            }
+
+            ViewBag.NomeBarbearia = "Barbearia Universo";
+        }
+
+        private void SalvarSessao(Usuario usuario, Barbearia barbearia)
+        {
+            HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
+            HttpContext.Session.SetString("UsuarioNome", usuario.UsuarioLogin);
+            HttpContext.Session.SetString("UsuarioTipo", usuario.Tipo);
+            HttpContext.Session.SetInt32("BarbeariaId", usuario.BarbeariaId);
+            HttpContext.Session.SetString("BarbeariaSlug", barbearia.Slug);
+
+            if (usuario.BarbeiroId.HasValue)
+                HttpContext.Session.SetInt32("BarbeiroId", usuario.BarbeiroId.Value);
+        }
+
+        private IActionResult RedirecionarPorTipo(Usuario usuario)
+        {
+            if (usuario.Tipo == "ADM")
+                return RedirectToAction("Index", "Dashboard");
+
+            if (usuario.Tipo == "BARBEIRO")
+                return RedirectToAction("Index", "PainelBarbeiro");
+
+            return RedirectToAction("Index", "ClienteHome");
         }
     }
 }

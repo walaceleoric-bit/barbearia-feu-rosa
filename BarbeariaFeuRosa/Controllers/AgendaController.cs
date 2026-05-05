@@ -10,19 +10,27 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
-        private const int BarbeariaAtualId = 1;
-
         public AgendaController(AppDbContext context)
         {
             _context = context;
         }
 
+        private int? ObterBarbeariaId()
+        {
+            return HttpContext.Session.GetInt32("BarbeariaId");
+        }
+
         public IActionResult Index()
         {
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var agendamentos = _context.Agendamentos
                 .Include(a => a.Cliente)
                 .Include(a => a.Barbeiro)
-                .Where(a => a.BarbeariaId == BarbeariaAtualId)
+                .Where(a => a.BarbeariaId == barbeariaId.Value)
                 .OrderBy(a => a.DataHora)
                 .ToList();
 
@@ -31,19 +39,46 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Novo()
         {
-            CarregarCombos();
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+            CarregarCombos(barbeariaId.Value);
             return View();
         }
 
         [HttpPost]
         public IActionResult Novo(Agendamento agendamento)
         {
-            agendamento.BarbeariaId = BarbeariaAtualId;
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+            agendamento.BarbeariaId = barbeariaId.Value;
 
             ModelState.Remove("Cliente");
             ModelState.Remove("Barbeiro");
             ModelState.Remove("Barbearia");
             ModelState.Remove("BarbeariaId");
+
+            bool clienteExiste = _context.Clientes
+                .Any(c =>
+                    c.Id == agendamento.ClienteId &&
+                    c.BarbeariaId == barbeariaId.Value);
+
+            bool barbeiroExiste = _context.Barbeiros
+                .Any(b =>
+                    b.Id == agendamento.BarbeiroId &&
+                    b.BarbeariaId == barbeariaId.Value &&
+                    b.Ativo);
+
+            if (!clienteExiste)
+                ModelState.AddModelError("", "Cliente inválido para esta barbearia.");
+
+            if (!barbeiroExiste)
+                ModelState.AddModelError("", "Barbeiro inválido para esta barbearia.");
 
             if (ModelState.IsValid)
             {
@@ -61,16 +96,21 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Index");
             }
 
-            CarregarCombos();
+            CarregarCombos(barbeariaId.Value);
             return View(agendamento);
         }
 
         public IActionResult Excluir(int id)
         {
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var agendamento = _context.Agendamentos
                 .FirstOrDefault(a =>
                     a.Id == id &&
-                    a.BarbeariaId == BarbeariaAtualId);
+                    a.BarbeariaId == barbeariaId.Value);
 
             if (agendamento != null)
             {
@@ -79,15 +119,19 @@ namespace BarbeariaFeuRosa.Controllers
 
                 TempData["Sucesso"] = "Agendamento excluído com sucesso!";
             }
+            else
+            {
+                TempData["Erro"] = "Agendamento não encontrado.";
+            }
 
             return RedirectToAction("Index");
         }
 
-        private void CarregarCombos()
+        private void CarregarCombos(int barbeariaId)
         {
             ViewBag.Clientes = new SelectList(
                 _context.Clientes
-                    .Where(c => c.BarbeariaId == BarbeariaAtualId)
+                    .Where(c => c.BarbeariaId == barbeariaId)
                     .OrderBy(c => c.Nome),
                 "Id",
                 "Nome"
@@ -96,7 +140,7 @@ namespace BarbeariaFeuRosa.Controllers
             ViewBag.Barbeiros = new SelectList(
                 _context.Barbeiros
                     .Where(b =>
-                        b.BarbeariaId == BarbeariaAtualId &&
+                        b.BarbeariaId == barbeariaId &&
                         b.Ativo)
                     .OrderBy(b => b.Nome),
                 "Id",

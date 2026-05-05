@@ -8,16 +8,24 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
-        private const int BarbeariaAtualId = 1;
-
         public HistoricoClienteController(AppDbContext context)
         {
             _context = context;
         }
 
+        private int? ObterBarbeariaId()
+        {
+            return HttpContext.Session.GetInt32("BarbeariaId");
+        }
+
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("UsuarioTipo") != "CLIENTE")
+                return RedirectToAction("Login", "Auth");
+
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
                 return RedirectToAction("Login", "Auth");
 
             var usuarioNome = HttpContext.Session.GetString("UsuarioNome");
@@ -26,7 +34,7 @@ namespace BarbeariaFeuRosa.Controllers
                 .Include(a => a.Cliente)
                 .Include(a => a.Barbeiro)
                 .Where(a =>
-                    a.BarbeariaId == BarbeariaAtualId &&
+                    a.BarbeariaId == barbeariaId.Value &&
                     a.Cliente != null &&
                     a.Cliente.Nome == usuarioNome)
                 .OrderByDescending(a => a.DataHora)
@@ -40,13 +48,18 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "CLIENTE")
                 return RedirectToAction("Login", "Auth");
 
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var usuarioNome = HttpContext.Session.GetString("UsuarioNome");
 
             var agendamento = _context.Agendamentos
                 .Include(a => a.Cliente)
                 .FirstOrDefault(a =>
                     a.Id == id &&
-                    a.BarbeariaId == BarbeariaAtualId &&
+                    a.BarbeariaId == barbeariaId.Value &&
                     a.Cliente != null &&
                     a.Cliente.Nome == usuarioNome);
 
@@ -64,18 +77,22 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "CLIENTE")
                 return RedirectToAction("Login", "Auth");
 
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var usuarioNome = HttpContext.Session.GetString("UsuarioNome");
 
             var historico = _context.Agendamentos
                 .Include(a => a.Cliente)
                 .Where(a =>
-                    a.BarbeariaId == BarbeariaAtualId &&
+                    a.BarbeariaId == barbeariaId.Value &&
                     a.Cliente != null &&
                     a.Cliente.Nome == usuarioNome)
                 .ToList();
 
             _context.Agendamentos.RemoveRange(historico);
-
             _context.SaveChanges();
 
             return RedirectToAction("Index");

@@ -9,8 +9,6 @@ namespace BarbeariaFeuRosa.Controllers
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
-        private const int BarbeariaAtualId = 1;
-
         public ConfiguracoesController(
             AppDbContext context,
             IWebHostEnvironment environment)
@@ -19,20 +17,34 @@ namespace BarbeariaFeuRosa.Controllers
             _environment = environment;
         }
 
+        private int? ObterBarbeariaId()
+        {
+            return HttpContext.Session.GetInt32("BarbeariaId");
+        }
+
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("UsuarioTipo") != "ADM")
                 return RedirectToAction("Login", "Auth");
 
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var configuracao = _context.Configuracoes
-                .FirstOrDefault();
+                .FirstOrDefault(c => c.BarbeariaId == barbeariaId.Value);
 
             if (configuracao == null)
             {
-                configuracao = new Configuracao();
+                configuracao = new Configuracao
+                {
+                    BarbeariaId = barbeariaId.Value,
+                    NomeBarbearia = "Minha Barbearia",
+                    PromocaoDestaque = "Corte + Barba com preço especial."
+                };
 
                 _context.Configuracoes.Add(configuracao);
-
                 _context.SaveChanges();
             }
 
@@ -54,12 +66,20 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "ADM")
                 return RedirectToAction("Login", "Auth");
 
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var configAtual = _context.Configuracoes
-                .FirstOrDefault();
+                .FirstOrDefault(c => c.BarbeariaId == barbeariaId.Value);
 
             if (configAtual == null)
             {
-                configAtual = new Configuracao();
+                configAtual = new Configuracao
+                {
+                    BarbeariaId = barbeariaId.Value
+                };
 
                 _context.Configuracoes.Add(configAtual);
             }
@@ -89,30 +109,24 @@ namespace BarbeariaFeuRosa.Controllers
             {
                 if (novaSenhaAdm.Length > 6)
                 {
-                    TempData["Erro"] =
-                        "A nova senha do ADM deve ter no máximo 6 caracteres.";
-
+                    TempData["Erro"] = "A nova senha do ADM deve ter no máximo 6 caracteres.";
                     return RedirectToAction("Index");
                 }
 
                 var adm = _context.Usuarios
                     .FirstOrDefault(u =>
                         u.Tipo == "ADM" &&
-                        u.BarbeariaId == BarbeariaAtualId);
+                        u.BarbeariaId == barbeariaId.Value);
 
                 if (adm == null)
                 {
-                    TempData["Erro"] =
-                        "Usuário ADM não encontrado.";
-
+                    TempData["Erro"] = "Usuário ADM não encontrado.";
                     return RedirectToAction("Index");
                 }
 
                 if (adm.Senha != senhaAdmAtual)
                 {
-                    TempData["Erro"] =
-                        "Senha atual do ADM incorreta.";
-
+                    TempData["Erro"] = "Senha atual do ADM incorreta.";
                     return RedirectToAction("Index");
                 }
 
@@ -121,8 +135,7 @@ namespace BarbeariaFeuRosa.Controllers
 
             _context.SaveChanges();
 
-            TempData["Sucesso"] =
-                "Configurações salvas com sucesso!";
+            TempData["Sucesso"] = "Configurações salvas com sucesso!";
 
             return RedirectToAction("Index");
         }
@@ -131,13 +144,11 @@ namespace BarbeariaFeuRosa.Controllers
         {
             var pastaUploads = Path.Combine(
                 _environment.WebRootPath,
-                "uploads");
+                "uploads"
+            );
 
             if (!Directory.Exists(pastaUploads))
-            {
-                Directory.CreateDirectory(
-                    pastaUploads);
-            }
+                Directory.CreateDirectory(pastaUploads);
 
             var nomeArquivo =
                 Guid.NewGuid().ToString() +
@@ -145,12 +156,10 @@ namespace BarbeariaFeuRosa.Controllers
 
             var caminhoArquivo = Path.Combine(
                 pastaUploads,
-                nomeArquivo);
+                nomeArquivo
+            );
 
-            using (var stream =
-                   new FileStream(
-                       caminhoArquivo,
-                       FileMode.Create))
+            using (var stream = new FileStream(caminhoArquivo, FileMode.Create))
             {
                 arquivo.CopyTo(stream);
             }

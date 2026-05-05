@@ -7,11 +7,14 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
-        private const int BarbeariaAtualId = 1;
-
         public ClienteHomeController(AppDbContext context)
         {
             _context = context;
+        }
+
+        private int? ObterBarbeariaId()
+        {
+            return HttpContext.Session.GetInt32("BarbeariaId");
         }
 
         public IActionResult Index()
@@ -19,22 +22,19 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "CLIENTE")
                 return RedirectToAction("Login", "Auth");
 
-            var usuarioBarbeariaId =
-                HttpContext.Session.GetInt32("BarbeariaId");
+            var barbeariaId = ObterBarbeariaId();
 
-            if (usuarioBarbeariaId != BarbeariaAtualId)
+            if (barbeariaId == null)
                 return RedirectToAction("Login", "Auth");
 
             var config = _context.Configuracoes
-                .FirstOrDefault();
+                .FirstOrDefault(c => c.BarbeariaId == barbeariaId.Value);
 
             ViewBag.NomeBarbearia =
-                config?.NomeBarbearia
-                ?? "Barbearia Feu Rosa";
+                config?.NomeBarbearia ?? "Minha Barbearia";
 
             ViewBag.Promocao =
-                config?.PromocaoDestaque
-                ?? "Corte + Barba com preço especial.";
+                config?.PromocaoDestaque ?? "Corte + Barba com preço especial.";
 
             ViewBag.Logo = config?.LogoUrl;
 

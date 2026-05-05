@@ -8,11 +8,14 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
-        private const int BarbeariaAtualId = 1;
-
         public PainelBarbeiroController(AppDbContext context)
         {
             _context = context;
+        }
+
+        private int? ObterBarbeariaId()
+        {
+            return HttpContext.Session.GetInt32("BarbeariaId");
         }
 
         public IActionResult Index(string secao = "inicio", string filtro = "hoje")
@@ -20,18 +23,22 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "BARBEIRO")
                 return RedirectToAction("Login", "Auth");
 
+            var barbeariaId = ObterBarbeariaId();
             var barbeiroId = HttpContext.Session.GetInt32("BarbeiroId");
 
-            if (barbeiroId == null)
+            if (barbeariaId == null || barbeiroId == null)
                 return RedirectToAction("Login", "Auth");
 
             var barbeiro = _context.Barbeiros
                 .FirstOrDefault(x =>
                     x.Id == barbeiroId.Value &&
-                    x.BarbeariaId == BarbeariaAtualId);
+                    x.BarbeariaId == barbeariaId.Value);
 
-            ViewBag.NomeBarbeiro = barbeiro?.Nome ?? "Barbeiro";
-            ViewBag.ComissaoPercentual = barbeiro?.ComissaoPercentual ?? 0;
+            if (barbeiro == null)
+                return RedirectToAction("Login", "Auth");
+
+            ViewBag.NomeBarbeiro = barbeiro.Nome;
+            ViewBag.ComissaoPercentual = barbeiro.ComissaoPercentual;
             ViewBag.FiltroAtual = filtro;
             ViewBag.SecaoAtual = secao;
 
@@ -51,7 +58,7 @@ namespace BarbeariaFeuRosa.Controllers
                 .Include(x => x.Cliente)
                 .Include(x => x.Barbeiro)
                 .Where(x =>
-                    x.BarbeariaId == BarbeariaAtualId &&
+                    x.BarbeariaId == barbeariaId.Value &&
                     x.BarbeiroId == barbeiroId.Value);
 
             if (filtro == "hoje")
@@ -75,7 +82,7 @@ namespace BarbeariaFeuRosa.Controllers
                 .Include(x => x.Cliente)
                 .Include(x => x.Barbeiro)
                 .Where(x =>
-                    x.BarbeariaId == BarbeariaAtualId &&
+                    x.BarbeariaId == barbeariaId.Value &&
                     x.BarbeiroId == barbeiroId.Value)
                 .ToList();
 
@@ -94,7 +101,7 @@ namespace BarbeariaFeuRosa.Controllers
                     x.DataHora < primeiroDiaProximoMes)
                 .ToList();
 
-            decimal percentual = barbeiro?.ComissaoPercentual ?? 0;
+            decimal percentual = barbeiro.ComissaoPercentual;
 
             ViewBag.TotalHoje = agendamentosHoje.Count;
 
@@ -137,15 +144,16 @@ namespace BarbeariaFeuRosa.Controllers
             if (HttpContext.Session.GetString("UsuarioTipo") != "BARBEIRO")
                 return RedirectToAction("Login", "Auth");
 
+            var barbeariaId = ObterBarbeariaId();
             var barbeiroId = HttpContext.Session.GetInt32("BarbeiroId");
 
-            if (barbeiroId == null)
+            if (barbeariaId == null || barbeiroId == null)
                 return RedirectToAction("Login", "Auth");
 
             var agendamento = _context.Agendamentos
                 .FirstOrDefault(x =>
                     x.Id == id &&
-                    x.BarbeariaId == BarbeariaAtualId &&
+                    x.BarbeariaId == barbeariaId.Value &&
                     x.BarbeiroId == barbeiroId.Value);
 
             if (agendamento == null)

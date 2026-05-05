@@ -8,17 +8,25 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
 
-        private const int BarbeariaAtualId = 1;
-
         public ClientesController(AppDbContext context)
         {
             _context = context;
         }
 
+        private int? ObterBarbeariaId()
+        {
+            return HttpContext.Session.GetInt32("BarbeariaId");
+        }
+
         public IActionResult Index()
         {
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var clientes = _context.Clientes
-                .Where(c => c.BarbeariaId == BarbeariaAtualId)
+                .Where(c => c.BarbeariaId == barbeariaId.Value)
                 .OrderBy(c => c.Nome)
                 .ToList();
 
@@ -27,13 +35,23 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Novo()
         {
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             return View();
         }
 
         [HttpPost]
         public IActionResult Novo(Cliente cliente)
         {
-            cliente.BarbeariaId = BarbeariaAtualId;
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+            cliente.BarbeariaId = barbeariaId.Value;
 
             ModelState.Remove("Barbearia");
             ModelState.Remove("BarbeariaId");
@@ -52,10 +70,15 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Editar(int id)
         {
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var cliente = _context.Clientes
                 .FirstOrDefault(c =>
                     c.Id == id &&
-                    c.BarbeariaId == BarbeariaAtualId);
+                    c.BarbeariaId == barbeariaId.Value);
 
             if (cliente == null)
             {
@@ -69,7 +92,12 @@ namespace BarbeariaFeuRosa.Controllers
         [HttpPost]
         public IActionResult Editar(Cliente cliente)
         {
-            cliente.BarbeariaId = BarbeariaAtualId;
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+            cliente.BarbeariaId = barbeariaId.Value;
 
             ModelState.Remove("Barbearia");
             ModelState.Remove("BarbeariaId");
@@ -88,10 +116,15 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Excluir(int id)
         {
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
             var cliente = _context.Clientes
                 .FirstOrDefault(c =>
                     c.Id == id &&
-                    c.BarbeariaId == BarbeariaAtualId);
+                    c.BarbeariaId == barbeariaId.Value);
 
             if (cliente != null)
             {
