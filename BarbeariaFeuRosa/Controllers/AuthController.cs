@@ -152,6 +152,8 @@ namespace BarbeariaFeuRosa.Controllers
             ModelState.Remove("BarbeariaId");
             ModelState.Remove("BarbeiroId");
             ModelState.Remove("Barbeiro");
+            ModelState.Remove("ClienteId");
+            ModelState.Remove("Cliente");
 
             if (!ModelState.IsValid)
                 return View(usuario);
@@ -224,8 +226,41 @@ namespace BarbeariaFeuRosa.Controllers
             HttpContext.Session.SetInt32("BarbeariaId", usuario.BarbeariaId);
             HttpContext.Session.SetString("BarbeariaSlug", barbearia.Slug);
 
-            if (usuario.BarbeiroId.HasValue)
-                HttpContext.Session.SetInt32("BarbeiroId", usuario.BarbeiroId.Value);
+            if (usuario.Tipo == "BARBEIRO")
+            {
+                if (!usuario.BarbeiroId.HasValue)
+                {
+                    var barbeiro = _context.Barbeiros
+                        .FirstOrDefault(b =>
+                            b.Nome == usuario.Nome &&
+                            b.BarbeariaId == usuario.BarbeariaId);
+
+                    if (barbeiro != null)
+                    {
+                        usuario.BarbeiroId = barbeiro.Id;
+                        _context.SaveChanges();
+                    }
+                }
+
+                if (usuario.BarbeiroId.HasValue)
+                {
+                    HttpContext.Session.SetInt32(
+                        "BarbeiroId",
+                        usuario.BarbeiroId.Value
+                    );
+                }
+            }
+
+            if (usuario.Tipo == "CLIENTE")
+            {
+                if (usuario.ClienteId.HasValue)
+                {
+                    HttpContext.Session.SetInt32(
+                        "ClienteId",
+                        usuario.ClienteId.Value
+                    );
+                }
+            }
         }
 
         private IActionResult RedirecionarPorTipo(Usuario usuario)
