@@ -52,6 +52,7 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Login", "Auth");
 
             barbeiro.BarbeariaId = barbeariaId.Value;
+            barbeiro.Ativo = true;
 
             ModelState.Remove("Barbearia");
             ModelState.Remove("BarbeariaId");
@@ -126,21 +127,42 @@ namespace BarbeariaFeuRosa.Controllers
             if (barbeariaId == null)
                 return RedirectToAction("Login", "Auth");
 
-            barbeiro.BarbeariaId = barbeariaId.Value;
-
             ModelState.Remove("Barbearia");
             ModelState.Remove("BarbeariaId");
 
-            if (ModelState.IsValid)
-            {
-                _context.Barbeiros.Update(barbeiro);
-                _context.SaveChanges();
+            if (!ModelState.IsValid)
+                return View(barbeiro);
 
-                TempData["Sucesso"] = "Barbeiro atualizado com sucesso!";
+            var barbeiroBanco = _context.Barbeiros
+                .FirstOrDefault(b =>
+                    b.Id == barbeiro.Id &&
+                    b.BarbeariaId == barbeariaId.Value);
+
+            if (barbeiroBanco == null)
+            {
+                TempData["Erro"] = "Barbeiro não encontrado.";
                 return RedirectToAction("Index");
             }
 
-            return View(barbeiro);
+            barbeiroBanco.Nome = barbeiro.Nome;
+            barbeiroBanco.Telefone = barbeiro.Telefone;
+            barbeiroBanco.Especialidade = barbeiro.Especialidade;
+            barbeiroBanco.ComissaoPercentual = barbeiro.ComissaoPercentual;
+            barbeiroBanco.Ativo = barbeiro.Ativo;
+
+            var usuario = _context.Usuarios
+                .FirstOrDefault(u =>
+                    u.BarbeiroId == barbeiroBanco.Id &&
+                    u.BarbeariaId == barbeariaId.Value &&
+                    u.Tipo == "BARBEIRO");
+
+            if (usuario != null)
+                usuario.Nome = barbeiroBanco.Nome;
+
+            _context.SaveChanges();
+
+            TempData["Sucesso"] = "Barbeiro atualizado com sucesso!";
+            return RedirectToAction("Index");
         }
 
         public IActionResult Excluir(int id)
