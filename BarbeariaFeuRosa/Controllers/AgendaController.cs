@@ -49,7 +49,7 @@ namespace BarbeariaFeuRosa.Controllers
         }
 
         [HttpPost]
-        public IActionResult Novo(Agendamento agendamento)
+        public IActionResult Novo(Agendamento agendamento, int servicoId)
         {
             var barbeariaId = ObterBarbeariaId();
 
@@ -62,6 +62,7 @@ namespace BarbeariaFeuRosa.Controllers
             ModelState.Remove("Barbeiro");
             ModelState.Remove("Barbearia");
             ModelState.Remove("BarbeariaId");
+            ModelState.Remove("Servico");
 
             bool clienteExiste = _context.Clientes
                 .Any(c =>
@@ -74,15 +75,28 @@ namespace BarbeariaFeuRosa.Controllers
                     b.BarbeariaId == barbeariaId.Value &&
                     b.Ativo);
 
+            var servicoSelecionado = _context.Servicos
+                .FirstOrDefault(s =>
+                    s.Id == servicoId &&
+                    s.BarbeariaId == barbeariaId.Value &&
+                    s.Ativo);
+
             if (!clienteExiste)
                 ModelState.AddModelError("", "Cliente inválido para esta barbearia.");
 
             if (!barbeiroExiste)
                 ModelState.AddModelError("", "Barbeiro inválido para esta barbearia.");
 
+            if (servicoSelecionado == null)
+                ModelState.AddModelError("", "Serviço inválido para esta barbearia.");
+
             if (ModelState.IsValid)
             {
                 agendamento.Status = "Agendado";
+
+                agendamento.Servico = servicoSelecionado!.Nome;
+
+                agendamento.Valor = servicoSelecionado.Valor;
 
                 agendamento.DataHora = DateTime.SpecifyKind(
                     agendamento.DataHora,
@@ -132,7 +146,8 @@ namespace BarbeariaFeuRosa.Controllers
             ViewBag.Clientes = new SelectList(
                 _context.Clientes
                     .Where(c => c.BarbeariaId == barbeariaId)
-                    .OrderBy(c => c.Nome),
+                    .OrderBy(c => c.Nome)
+                    .ToList(),
                 "Id",
                 "Nome"
             );
@@ -142,20 +157,27 @@ namespace BarbeariaFeuRosa.Controllers
                     .Where(b =>
                         b.BarbeariaId == barbeariaId &&
                         b.Ativo)
-                    .OrderBy(b => b.Nome),
+                    .OrderBy(b => b.Nome)
+                    .ToList(),
                 "Id",
                 "Nome"
             );
 
-            ViewBag.Servicos = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Corte", Text = "Corte" },
-                new SelectListItem { Value = "Barba", Text = "Barba" },
-                new SelectListItem { Value = "Corte + Barba", Text = "Corte + Barba" },
-                new SelectListItem { Value = "Sobrancelha", Text = "Sobrancelha" },
-                new SelectListItem { Value = "Pigmentação", Text = "Pigmentação" },
-                new SelectListItem { Value = "Acabamento", Text = "Acabamento" }
-            };
+            ViewBag.Servicos = new SelectList(
+                _context.Servicos
+                    .Where(s =>
+                        s.BarbeariaId == barbeariaId &&
+                        s.Ativo)
+                    .OrderBy(s => s.Nome)
+                    .Select(s => new
+                    {
+                        Nome = s.Nome,
+                        NomeValor = s.Nome + " - R$ " + s.Valor.ToString("N2")
+                    })
+                    .ToList(),
+                "Nome",
+                "NomeValor"
+            );
         }
     }
 }

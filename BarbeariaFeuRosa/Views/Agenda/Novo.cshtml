@@ -17,56 +17,129 @@
     <hr />
 
     <form asp-action="Novo" method="post">
-        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div asp-validation-summary="All"
+             class="text-danger mb-3"></div>
 
         <div class="mb-3">
             <label>Cliente</label>
+
             <select asp-for="ClienteId"
                     asp-items="ViewBag.Clientes"
                     class="form-control">
-                <option value="">Selecione...</option>
+
+                <option value="">
+                    Selecione...
+                </option>
+
             </select>
         </div>
+
 
         <div class="mb-3">
             <label>Barbeiro</label>
+
             <select asp-for="BarbeiroId"
                     asp-items="ViewBag.Barbeiros"
                     class="form-control">
-                <option value="">Selecione...</option>
+
+                <option value="">
+                    Selecione...
+                </option>
+
             </select>
         </div>
+
 
         <div class="mb-3">
             <label>Serviço</label>
-            <select asp-for="Servico"
-                    asp-items="ViewBag.Servicos"
-                    class="form-control">
-                <option value="">Selecione...</option>
+
+            <select name="servicoId"
+                    id="servicoId"
+                    class="form-control"
+                    required
+                    onchange="preencherValorServico()">
+
+                <option value="">
+                    Selecione...
+                </option>
+
+                @foreach (var servico in ViewBag.Servicos)
+                {
+                    <option value="@servico.Id"
+                            data-valor="@servico.Valor">
+
+                        @servico.Nome - R$ @servico.Valor.ToString("N2")
+
+                    </option>
+                }
+
             </select>
         </div>
 
+
         <div class="mb-3">
             <label>Data e Hora</label>
+
             <input asp-for="DataHora"
                    type="datetime-local"
                    class="form-control" />
         </div>
 
+
         <div class="mb-3">
             <label>Valor</label>
+
             <input asp-for="Valor"
-                   class="form-control" />
+                   id="Valor"
+                   class="form-control"
+                   readonly />
         </div>
 
-        <button type="submit" class="btn btn-dark">
+
+        <button type="submit"
+                class="btn btn-dark">
+
             Salvar
+
         </button>
 
-        <a href="/Agenda" class="btn btn-secondary">
+        <a href="/Agenda"
+           class="btn btn-secondary">
+
             Cancelar
+
         </a>
 
     </form>
 
 </div>
+
+
+<script>
+
+    function preencherValorServico() {
+
+        const select =
+            document.getElementById("servicoId");
+
+        const valorInput =
+            document.getElementById("Valor");
+
+        const option =
+            select.options[select.selectedIndex];
+
+        if (option && option.dataset.valor) {
+
+            valorInput.value =
+                option.dataset.valor;
+
+        }
+        else {
+
+            valorInput.value = "";
+
+        }
+    }
+
+</script>
