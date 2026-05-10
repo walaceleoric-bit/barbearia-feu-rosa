@@ -25,22 +25,22 @@
             <hr />
 
             <a href="/ClienteHome/Index"
-                   class="text-white text-decoration-none d-block mb-3">
+               class="text-white text-decoration-none d-block mb-3">
                 🏠 Início
             </a>
 
             <a href="/AgendamentoOnline/Index"
-                   class="text-white text-decoration-none d-block mb-3">
+               class="text-white text-decoration-none d-block mb-3">
                 📅 Agendar
             </a>
 
             <a href="/HistoricoCliente/Index"
-                   class="text-white text-decoration-none d-block mb-3">
+               class="text-white text-decoration-none d-block mb-3">
                 📖 Histórico
             </a>
 
             <a href="/Auth/Sair"
-                   class="text-white text-decoration-none d-block mt-5">
+               class="text-white text-decoration-none d-block mt-5">
                 🚪 Sair
             </a>
 
@@ -49,10 +49,13 @@
 
         <div class="col-10 p-4">
 
-            <h2>Olá, @ViewBag.NomeCliente</h2>
 
-            <p class="text-muted">
-                Bem-vindo à sua área.
+            <h2 style="font-weight:700;">
+                Bem-vindo, @ViewBag.NomeCliente 👋
+            </h2>
+
+            <p class="text-muted mb-4">
+                Seu estilo começa aqui.
             </p>
 
             <hr />
@@ -72,115 +75,178 @@
             @if (imagens.Any())
             {
                 <style>
-                                .carrossel-destaque {
-                                    background: #111;
-                                    border-radius: 12px;
-                                    padding: 25px;
-                                    overflow: hidden;
-                                    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-                                }
 
-                                .carrossel-area {
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    gap: 18px;
-                                }
+                    .titulo-destaque{
+                        font-size:28px;
+                        font-weight:700;
+                        margin-bottom:20px;
+                    }
 
-                                .carrossel-img {
-                                    width: 26%;
-                                    height: 210px;
-                                    object-fit: cover;
-                                    border-radius: 12px;
-                                    opacity: 0.45;
-                                    transform: scale(0.88);
-                                    transition: all 0.6s ease;
-                                }
+                    .carrossel-destaque{
+                        background:#111;
+                        border-radius:18px;
+                        padding:30px;
+                        overflow:hidden;
+                    }
 
-                                    .carrossel-img.ativa {
-                                        width: 42%;
-                                        height: 260px;
-                                        opacity: 1;
-                                        transform: scale(1.05);
-                                        box-shadow: 0 0 18px rgba(255,255,255,0.25);
-                                        z-index: 2;
-                                    }
+                    .carrossel-area{
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        gap:18px;
+                    }
 
-                                .carrossel-botoes {
-                                    display: flex;
-                                    justify-content: center;
-                                    gap: 12px;
-                                    margin-top: 18px;
-                                }
+                    .carrossel-img{
+                        width:26%;
+                        height:220px;
+                        object-fit:cover;
+                        border-radius:16px;
+                        opacity:.45;
+                        transform:scale(.88);
+                        transition:.6s;
+                    }
 
-                                    .carrossel-botoes button {
-                                        border: none;
-                                        background: #fff;
-                                        color: #111;
-                                        width: 38px;
-                                        height: 38px;
-                                        border-radius: 50%;
-                                        font-weight: bold;
-                                    }
+                    .ativa{
+                        width:42%;
+                        height:280px;
+                        opacity:1;
+                        transform:scale(1.05);
+                        box-shadow:0 0 20px rgba(255,255,255,.18);
+                    }
+
+                    .carrossel-legenda{
+                        text-align:center;
+                        margin-top:18px;
+                        font-size:18px;
+                        font-weight:600;
+                    }
+
+                    .promo-card{
+                        border-radius:18px;
+                        padding:35px;
+                        margin-top:35px;
+                    }
+
+                    .promo-titulo{
+                        font-size:30px;
+                        font-weight:700;
+                        margin-bottom:20px;
+                    }
+
+                    .cta-card{
+                        border-radius:18px;
+                        padding:30px;
+                        margin-top:25px;
+                    }
+
                 </style>
+
+
+                <div class="titulo-destaque">
+                    ✨ Destaques da Barbearia
+                </div>
+
 
                 <div class="carrossel-destaque mb-4">
 
                     <div class="carrossel-area">
-                        <img id="imgAnterior" class="carrossel-img" />
-                        <img id="imgAtual" class="carrossel-img ativa" />
-                        <img id="imgProxima" class="carrossel-img" />
+
+                        <img id="imgAnterior"
+                             class="carrossel-img" />
+
+                        <img id="imgAtual"
+                             class="carrossel-img ativa" />
+
+                        <img id="imgProxima"
+                             class="carrossel-img" />
+
                     </div>
 
-                    <div class="carrossel-botoes">
-                        <button type="button" onclick="voltarImagem()">‹</button>
-                        <button type="button" onclick="avancarImagem()">›</button>
+                    <div class="carrossel-legenda">
+                        Cortes em destaque
                     </div>
 
                 </div>
 
+
                 <script>
-                                const imagensCarrossel = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(imagens));
 
-                                let indiceAtual = 0;
+                    const imagensCarrossel =
+                    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(imagens));
 
-                                function atualizarCarrossel() {
-                                    const total = imagensCarrossel.length;
+                    let indiceAtual = 0;
 
-                                    const anterior = (indiceAtual - 1 + total) % total;
-                                    const proxima = (indiceAtual + 1) % total;
+                    function atualizarCarrossel() {
 
-                                    document.getElementById("imgAnterior").src = imagensCarrossel[anterior];
-                                    document.getElementById("imgAtual").src = imagensCarrossel[indiceAtual];
-                                    document.getElementById("imgProxima").src = imagensCarrossel[proxima];
-                                }
+                        const total =
+                            imagensCarrossel.length;
 
-                                function avancarImagem() {
-                                    indiceAtual = (indiceAtual + 1) % imagensCarrossel.length;
-                                    atualizarCarrossel();
-                                }
+                        const anterior =
+                            (indiceAtual - 1 + total) % total;
 
-                                function voltarImagem() {
-                                    indiceAtual = (indiceAtual - 1 + imagensCarrossel.length) % imagensCarrossel.length;
-                                    atualizarCarrossel();
-                                }
+                        const proxima =
+                            (indiceAtual + 1) % total;
 
-                                atualizarCarrossel();
+                        document.getElementById("imgAnterior").src =
+                            imagensCarrossel[anterior];
 
-                                setInterval(avancarImagem, 4000);
+                        document.getElementById("imgAtual").src =
+                            imagensCarrossel[indiceAtual];
+
+                        document.getElementById("imgProxima").src =
+                            imagensCarrossel[proxima];
+                    }
+
+                    function avancarImagem() {
+
+                        indiceAtual =
+                            (indiceAtual + 1) % imagensCarrossel.length;
+
+                        atualizarCarrossel();
+                    }
+
+                    atualizarCarrossel();
+
+                    setInterval(avancarImagem,4000);
+
                 </script>
             }
 
 
-            <div class="card p-4 shadow-sm">
 
-                <h4>Promoção do dia</h4>
+            <div class="card promo-card">
 
-                <p class="mt-3">
+                <div class="promo-titulo">
+                    🔥 Promoção Especial
+                </div>
+
+                <h4>
                     @ViewBag.Promocao
-                </p>
+                </h4>
 
             </div>
+
+
+
+            <div class="card cta-card">
+
+                <h4>
+                    📅 Pronto para renovar o visual?
+                </h4>
+
+                <p class="mt-3">
+                    Agende seu horário em poucos segundos.
+                </p>
+
+                <a href="/AgendamentoOnline/Index"
+                   class="btn btn-dark mt-2">
+
+                    Agendar Agora
+
+                </a>
+
+            </div>
+
 
         </div>
 
