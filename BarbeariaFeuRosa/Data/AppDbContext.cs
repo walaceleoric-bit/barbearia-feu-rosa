@@ -13,6 +13,8 @@ namespace BarbeariaFeuRosa.Data
 
         public DbSet<Cliente> Clientes { get; set; }
 
+        public DbSet<Servico> Servicos { get; set; }
+
         public DbSet<Configuracao> Configuracoes { get; set; }
 
         public DbSet<Usuario> Usuarios { get; set; }

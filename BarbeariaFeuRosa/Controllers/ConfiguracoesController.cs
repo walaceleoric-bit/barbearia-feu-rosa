@@ -53,6 +53,11 @@ namespace BarbeariaFeuRosa.Controllers
                 _context.SaveChanges();
             }
 
+            ViewBag.Servicos = _context.Servicos
+                .Where(s => s.BarbeariaId == barbeariaId.Value && s.Ativo)
+                .OrderBy(s => s.Nome)
+                .ToList();
+
             return View(configuracao);
         }
 
@@ -141,6 +146,85 @@ namespace BarbeariaFeuRosa.Controllers
             _context.SaveChanges();
 
             TempData["Sucesso"] = "Configurações salvas com sucesso!";
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult AdicionarServico(string nome, decimal valor)
+        {
+            if (HttpContext.Session.GetString("UsuarioTipo") != "ADM")
+                return RedirectToAction("Login", "Auth");
+
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+            if (string.IsNullOrWhiteSpace(nome))
+            {
+                TempData["Erro"] = "Informe o nome do serviço.";
+                return RedirectToAction("Index");
+            }
+
+            if (valor <= 0)
+            {
+                TempData["Erro"] = "Informe um valor válido para o serviço.";
+                return RedirectToAction("Index");
+            }
+
+            bool existe = _context.Servicos.Any(s =>
+                s.BarbeariaId == barbeariaId.Value &&
+                s.Ativo &&
+                s.Nome.ToLower() == nome.Trim().ToLower());
+
+            if (existe)
+            {
+                TempData["Erro"] = "Este serviço já existe nesta barbearia.";
+                return RedirectToAction("Index");
+            }
+
+            var servico = new Servico
+            {
+                Nome = nome.Trim(),
+                Valor = valor,
+                Ativo = true,
+                BarbeariaId = barbeariaId.Value
+            };
+
+            _context.Servicos.Add(servico);
+            _context.SaveChanges();
+
+            TempData["Sucesso"] = "Serviço adicionado com sucesso!";
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult ExcluirServico(int id)
+        {
+            if (HttpContext.Session.GetString("UsuarioTipo") != "ADM")
+                return RedirectToAction("Login", "Auth");
+
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+            var servico = _context.Servicos
+                .FirstOrDefault(s =>
+                    s.Id == id &&
+                    s.BarbeariaId == barbeariaId.Value);
+
+            if (servico == null)
+            {
+                TempData["Erro"] = "Serviço não encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            servico.Ativo = false;
+            _context.SaveChanges();
+
+            TempData["Sucesso"] = "Serviço excluído com sucesso!";
 
             return RedirectToAction("Index");
         }

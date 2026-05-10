@@ -31,6 +31,7 @@
     }
 
     <div class="card p-4 shadow-sm">
+
         <h5>Configurações da Barbearia</h5>
 
         <form asp-action="Index" method="post" enctype="multipart/form-data">
@@ -63,60 +64,82 @@
                 <div class="mb-3">
                     <label>Logo Atual</label>
                     <br />
-                    <img src="@Model.LogoUrl" style="max-height: 120px;" />
+                    <img src="@Model.LogoUrl"
+                         class="rounded mt-2"
+                         style="max-height:120px;" />
                 </div>
             }
 
             <hr />
 
             <h5>Carrossel da Página Inicial</h5>
-            <p class="text-muted">Escolha até 5 imagens em destaque.</p>
+
+            <p class="text-muted">
+                Escolha até 5 imagens em destaque.
+            </p>
 
             <div class="row">
+
                 <div class="col-md-6 mb-3">
                     <label>Imagem 1</label>
                     <input type="file" name="imagem1" class="form-control" />
+
                     @if (!string.IsNullOrEmpty(Model.CarrosselImagem1))
                     {
-                        <img src="@Model.CarrosselImagem1" class="mt-2 rounded" style="max-height: 100px;" />
+                        <img src="@Model.CarrosselImagem1"
+                             class="mt-2 rounded"
+                             style="max-height:100px;" />
                     }
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label>Imagem 2</label>
                     <input type="file" name="imagem2" class="form-control" />
+
                     @if (!string.IsNullOrEmpty(Model.CarrosselImagem2))
                     {
-                        <img src="@Model.CarrosselImagem2" class="mt-2 rounded" style="max-height: 100px;" />
+                        <img src="@Model.CarrosselImagem2"
+                             class="mt-2 rounded"
+                             style="max-height:100px;" />
                     }
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label>Imagem 3</label>
                     <input type="file" name="imagem3" class="form-control" />
+
                     @if (!string.IsNullOrEmpty(Model.CarrosselImagem3))
                     {
-                        <img src="@Model.CarrosselImagem3" class="mt-2 rounded" style="max-height: 100px;" />
+                        <img src="@Model.CarrosselImagem3"
+                             class="mt-2 rounded"
+                             style="max-height:100px;" />
                     }
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label>Imagem 4</label>
                     <input type="file" name="imagem4" class="form-control" />
+
                     @if (!string.IsNullOrEmpty(Model.CarrosselImagem4))
                     {
-                        <img src="@Model.CarrosselImagem4" class="mt-2 rounded" style="max-height: 100px;" />
+                        <img src="@Model.CarrosselImagem4"
+                             class="mt-2 rounded"
+                             style="max-height:100px;" />
                     }
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label>Imagem 5</label>
                     <input type="file" name="imagem5" class="form-control" />
+
                     @if (!string.IsNullOrEmpty(Model.CarrosselImagem5))
                     {
-                        <img src="@Model.CarrosselImagem5" class="mt-2 rounded" style="max-height: 100px;" />
+                        <img src="@Model.CarrosselImagem5"
+                             class="mt-2 rounded"
+                             style="max-height:100px;" />
                     }
                 </div>
+
             </div>
 
             <hr />
@@ -125,18 +148,94 @@
 
             <div class="mb-3">
                 <label>Senha Atual do ADM</label>
-                <input type="password" name="senhaAdmAtual" maxlength="6" class="form-control" />
+
+                <input type="password"
+                       name="senhaAdmAtual"
+                       maxlength="6"
+                       class="form-control" />
             </div>
 
             <div class="mb-3">
                 <label>Nova Senha do ADM</label>
-                <input type="password" name="novaSenhaAdm" maxlength="6" class="form-control" />
+
+                <input type="password"
+                       name="novaSenhaAdm"
+                       maxlength="6"
+                       class="form-control" />
             </div>
 
-            <button type="submit" class="btn btn-dark w-100">
+            <button type="submit"
+                    class="btn btn-dark w-100">
+
                 Salvar Configurações
+
             </button>
 
         </form>
+
+        <hr />
+
+        <h5>Serviços da Barbearia</h5>
+
+        <form asp-action="AdicionarServico" method="post">
+
+            <div class="row">
+
+                <div class="col-md-5 mb-3">
+
+                    <input name="nome"
+                           class="form-control"
+                           placeholder="Nome do serviço" />
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <input name="valor"
+                           type="number"
+                           step="0.01"
+                           class="form-control"
+                           placeholder="Valor" />
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <button type="submit"
+                            class="btn btn-success w-100">
+
+                        + Adicionar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+        @if (ViewBag.Servicos != null)
+        {
+            foreach (var servico in ViewBag.Servicos)
+            {
+                <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+
+                    <span>
+                        @servico.Nome -
+                        @servico.Valor.ToString("C")
+                    </span>
+
+                    <a href="/Configuracoes/ExcluirServico/@servico.Id"
+                       class="btn btn-danger btn-sm">
+
+                        Excluir
+
+                    </a>
+
+                </div>
+            }
+        }
+
     </div>
+
 </div>
