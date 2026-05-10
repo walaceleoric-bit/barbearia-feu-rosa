@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BarbeariaFeuRosa.Data;
 using BarbeariaFeuRosa.Models;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace BarbeariaFeuRosa.Controllers
 {
@@ -8,13 +10,16 @@ namespace BarbeariaFeuRosa.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
         public ConfiguracoesController(
             AppDbContext context,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            IConfiguration configuration)
         {
             _context = context;
             _environment = environment;
+            _configuration = configuration;
         }
 
         private int? ObterBarbeariaId()
@@ -142,29 +147,24 @@ namespace BarbeariaFeuRosa.Controllers
 
         private string SalvarArquivo(IFormFile arquivo)
         {
-            var pastaUploads = Path.Combine(
-                _environment.WebRootPath,
-                "uploads"
-            );
+            var cloudName = _configuration["Cloudinary:CloudName"];
+            var apiKey = _configuration["Cloudinary:ApiKey"];
+            var apiSecret = _configuration["Cloudinary:ApiSecret"];
 
-            if (!Directory.Exists(pastaUploads))
-                Directory.CreateDirectory(pastaUploads);
+            var account = new Account(cloudName, apiKey, apiSecret);
+            var cloudinary = new Cloudinary(account);
 
-            var nomeArquivo =
-                Guid.NewGuid().ToString() +
-                Path.GetExtension(arquivo.FileName);
+            using var stream = arquivo.OpenReadStream();
 
-            var caminhoArquivo = Path.Combine(
-                pastaUploads,
-                nomeArquivo
-            );
-
-            using (var stream = new FileStream(caminhoArquivo, FileMode.Create))
+            var uploadParams = new ImageUploadParams
             {
-                arquivo.CopyTo(stream);
-            }
+                File = new FileDescription(arquivo.FileName, stream),
+                Folder = "barbearia-feu-rosa"
+            };
 
-            return "/uploads/" + nomeArquivo;
+            var uploadResult = cloudinary.Upload(uploadParams);
+
+            return uploadResult.SecureUrl.ToString();
         }
     }
 }
