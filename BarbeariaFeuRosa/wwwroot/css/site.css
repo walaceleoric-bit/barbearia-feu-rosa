@@ -465,3 +465,22 @@ h6 {
         flex-wrap: wrap;
     }
 }
+/* ===========================
+   MENU ATIVO
+=========================== */
+
+.menu-ativo {
+    background: linear-gradient(90deg, rgba(52, 211, 111, .28), rgba(240, 184, 74, .12)) !important;
+    color: #70ff9d !important;
+    border-left: 4px solid #34d36f;
+    box-shadow: 0 0 18px rgba(52, 211, 111, .16);
+    transform: translateX(4px);
+}
+
+    .menu-ativo::after {
+        content: "●";
+        float: right;
+        color: #34d36f;
+        font-size: 11px;
+        margin-top: 4px;
+    }
