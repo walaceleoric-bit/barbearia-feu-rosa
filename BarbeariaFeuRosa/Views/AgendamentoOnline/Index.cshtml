@@ -7,33 +7,65 @@
     <h2>Agendar Horário</h2>
     <hr />
 
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">
+
+            @TempData["Erro"]
+
+        </div>
+    }
+
     <form method="post">
 
         <div class="mb-3">
             <label>Barbeiro</label>
-            <select name="barbeiroId" asp-items="ViewBag.Barbeiros" class="form-control" required>
-                <option value="">Selecione...</option>
+
+            <select name="barbeiroId"
+                    asp-items="ViewBag.Barbeiros"
+                    class="form-control"
+                    required>
+
+                <option value="">
+                    Selecione...
+                </option>
+
             </select>
         </div>
 
         <div class="mb-3">
             <label>Serviço</label>
-            <select name="servico" asp-items="ViewBag.Servicos" class="form-control" required>
-                <option value="">Selecione...</option>
+
+            <select name="servicoId"
+                    asp-items="ViewBag.Servicos"
+                    class="form-control"
+                    required>
+
+                <option value="">
+                    Selecione...
+                </option>
+
             </select>
         </div>
 
         <div class="mb-3">
             <label>Data e Hora</label>
-            <input name="dataHora" type="datetime-local" class="form-control" required />
+
+            <input name="dataHora"
+                   type="datetime-local"
+                   class="form-control"
+                   required />
         </div>
 
         <button class="btn btn-dark">
             Confirmar Agendamento
         </button>
 
-        <a href="/ClienteHome/Index" class="btn btn-secondary">
+        <a href="/ClienteHome/Index"
+           class="btn btn-secondary">
+
             Voltar
+
         </a>
 
     </form>

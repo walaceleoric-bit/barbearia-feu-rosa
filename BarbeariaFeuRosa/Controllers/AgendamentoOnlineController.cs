@@ -35,7 +35,7 @@ namespace BarbeariaFeuRosa.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(int barbeiroId, string servico, DateTime dataHora)
+        public IActionResult Index(int barbeiroId, int servicoId, DateTime dataHora)
         {
             if (HttpContext.Session.GetString("UsuarioTipo") != "CLIENTE")
                 return RedirectToAction("Login", "Auth");
@@ -78,23 +78,27 @@ namespace BarbeariaFeuRosa.Controllers
                 return View();
             }
 
-            decimal valor = servico switch
+            var servicoSelecionado = _context.Servicos
+                .FirstOrDefault(s =>
+                    s.Id == servicoId &&
+                    s.BarbeariaId == barbeariaId.Value &&
+                    s.Ativo);
+
+            if (servicoSelecionado == null)
             {
-                "Corte" => 30,
-                "Barba" => 20,
-                "Corte + Barba" => 50,
-                "Sobrancelha" => 10,
-                _ => 0
-            };
+                TempData["Erro"] = "Serviço inválido.";
+                CarregarCombos(barbeariaId.Value);
+                return View();
+            }
 
             var agendamento = new Agendamento
             {
                 BarbeariaId = barbeariaId.Value,
                 ClienteId = cliente.Id,
                 BarbeiroId = barbeiroId,
-                Servico = servico,
+                Servico = servicoSelecionado.Nome,
                 DataHora = DateTime.SpecifyKind(dataHora, DateTimeKind.Utc),
-                Valor = valor,
+                Valor = servicoSelecionado.Valor,
                 Status = "Agendado"
             };
 
@@ -113,18 +117,22 @@ namespace BarbeariaFeuRosa.Controllers
                     .Where(b =>
                         b.BarbeariaId == barbeariaId &&
                         b.Ativo)
-                    .OrderBy(b => b.Nome),
+                    .OrderBy(b => b.Nome)
+                    .ToList(),
                 "Id",
                 "Nome"
             );
 
-            ViewBag.Servicos = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Corte", Text = "Corte - R$ 30,00" },
-                new SelectListItem { Value = "Barba", Text = "Barba - R$ 20,00" },
-                new SelectListItem { Value = "Corte + Barba", Text = "Corte + Barba - R$ 50,00" },
-                new SelectListItem { Value = "Sobrancelha", Text = "Sobrancelha - R$ 10,00" }
-            };
+            ViewBag.Servicos = new SelectList(
+                _context.Servicos
+                    .Where(s =>
+                        s.BarbeariaId == barbeariaId &&
+                        s.Ativo)
+                    .OrderBy(s => s.Nome)
+                    .ToList(),
+                "Id",
+                "Nome"
+            );
         }
     }
 }
