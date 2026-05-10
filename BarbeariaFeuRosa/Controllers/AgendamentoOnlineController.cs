@@ -124,15 +124,20 @@ namespace BarbeariaFeuRosa.Controllers
             );
 
             ViewBag.Servicos = new SelectList(
-                _context.Servicos
-                    .Where(s =>
-                        s.BarbeariaId == barbeariaId &&
-                        s.Ativo)
-                    .OrderBy(s => s.Nome)
-                    .ToList(),
-                "Id",
-                "Nome"
-            );
+     _context.Servicos
+         .Where(s =>
+             s.BarbeariaId == barbeariaId &&
+             s.Ativo)
+         .OrderBy(s => s.Nome)
+         .Select(s => new
+         {
+             Id = s.Id,
+             NomeValor = s.Nome + " - R$ " + s.Valor.ToString("N2")
+         })
+         .ToList(),
+     "Id",
+     "NomeValor"
+ );
         }
     }
 }
