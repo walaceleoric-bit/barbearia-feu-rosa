@@ -151,7 +151,7 @@ namespace BarbeariaFeuRosa.Controllers
         }
 
         [HttpPost]
-        public IActionResult AdicionarServico(string nome, decimal valor)
+        public IActionResult AdicionarServico(string nome, string valor)
         {
             if (HttpContext.Session.GetString("UsuarioTipo") != "ADM")
                 return RedirectToAction("Login", "Auth");
@@ -167,9 +167,27 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Index");
             }
 
-            if (valor <= 0)
+            if (string.IsNullOrWhiteSpace(valor))
             {
-                TempData["Erro"] = "Informe um valor válido para o serviço.";
+                TempData["Erro"] = "Informe o valor do serviço.";
+                return RedirectToAction("Index");
+            }
+
+            valor = valor.Replace(",", ".");
+
+            if (!decimal.TryParse(
+                valor,
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out decimal valorConvertido))
+            {
+                TempData["Erro"] = "Valor inválido.";
+                return RedirectToAction("Index");
+            }
+
+            if (valorConvertido <= 0)
+            {
+                TempData["Erro"] = "Informe um valor maior que zero.";
                 return RedirectToAction("Index");
             }
 
@@ -187,7 +205,7 @@ namespace BarbeariaFeuRosa.Controllers
             var servico = new Servico
             {
                 Nome = nome.Trim(),
-                Valor = valor,
+                Valor = valorConvertido,
                 Ativo = true,
                 BarbeariaId = barbeariaId.Value
             };
