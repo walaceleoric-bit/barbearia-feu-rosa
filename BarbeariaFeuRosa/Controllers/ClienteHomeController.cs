@@ -30,7 +30,14 @@ namespace BarbeariaFeuRosa.Controllers
             CarregarTelaCliente(barbeariaId.Value);
 
             ViewBag.NomeCliente =
-                HttpContext.Session.GetString("UsuarioNome");
+    HttpContext.Session.GetString("UsuarioNome");
+
+            ViewBag.Servicos = _context.Servicos
+                .Where(s =>
+                    s.BarbeariaId == barbeariaId.Value &&
+                    s.Ativo)
+                .OrderBy(s => s.Nome)
+                .ToList();
 
             ViewBag.ModoPreview = false;
 
@@ -48,6 +55,13 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Login", "Auth");
 
             CarregarTelaCliente(barbeariaId.Value);
+
+            ViewBag.Servicos = _context.Servicos
+                .Where(s =>
+                    s.BarbeariaId == barbeariaId.Value &&
+                    s.Ativo)
+                .OrderBy(s => s.Nome)
+                .ToList();
 
             ViewBag.NomeCliente = "Cliente Visitante";
             ViewBag.ModoPreview = true;
