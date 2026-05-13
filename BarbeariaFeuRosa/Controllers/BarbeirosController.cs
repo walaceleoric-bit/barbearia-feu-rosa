@@ -1,16 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BarbeariaFeuRosa.Models;
 using BarbeariaFeuRosa.Data;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace BarbeariaFeuRosa.Controllers
 {
     public class BarbeirosController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public BarbeirosController(AppDbContext context)
+        public BarbeirosController(
+            AppDbContext context,
+            IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         private int? ObterBarbeariaId()
@@ -44,7 +50,11 @@ namespace BarbeariaFeuRosa.Controllers
         }
 
         [HttpPost]
-        public IActionResult Novo(Barbeiro barbeiro, string usuarioLogin, string senha)
+        public IActionResult Novo(
+            Barbeiro barbeiro,
+            IFormFile? foto,
+            string usuarioLogin,
+            string senha)
         {
             var barbeariaId = ObterBarbeariaId();
 
@@ -76,6 +86,9 @@ namespace BarbeariaFeuRosa.Controllers
 
             if (!ModelState.IsValid)
                 return View(barbeiro);
+
+            if (foto != null && foto.Length > 0)
+                barbeiro.FotoUrl = SalvarFoto(foto);
 
             _context.Barbeiros.Add(barbeiro);
             _context.SaveChanges();
@@ -120,7 +133,9 @@ namespace BarbeariaFeuRosa.Controllers
         }
 
         [HttpPost]
-        public IActionResult Editar(Barbeiro barbeiro)
+        public IActionResult Editar(
+            Barbeiro barbeiro,
+            IFormFile? foto)
         {
             var barbeariaId = ObterBarbeariaId();
 
@@ -149,6 +164,9 @@ namespace BarbeariaFeuRosa.Controllers
             barbeiroBanco.Especialidade = barbeiro.Especialidade;
             barbeiroBanco.ComissaoPercentual = barbeiro.ComissaoPercentual;
             barbeiroBanco.Ativo = barbeiro.Ativo;
+
+            if (foto != null && foto.Length > 0)
+                barbeiroBanco.FotoUrl = SalvarFoto(foto);
 
             var usuario = _context.Usuarios
                 .FirstOrDefault(u =>
@@ -198,6 +216,28 @@ namespace BarbeariaFeuRosa.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        private string SalvarFoto(IFormFile arquivo)
+        {
+            var cloudName = _configuration["Cloudinary:CloudName"];
+            var apiKey = _configuration["Cloudinary:ApiKey"];
+            var apiSecret = _configuration["Cloudinary:ApiSecret"];
+
+            var account = new Account(cloudName, apiKey, apiSecret);
+            var cloudinary = new Cloudinary(account);
+
+            using var stream = arquivo.OpenReadStream();
+
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(arquivo.FileName, stream),
+                Folder = "barbearia-feu-rosa/barbeiros"
+            };
+
+            var uploadResult = cloudinary.Upload(uploadParams);
+
+            return uploadResult.SecureUrl.ToString();
         }
     }
 }

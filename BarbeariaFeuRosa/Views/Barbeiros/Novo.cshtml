@@ -7,10 +7,9 @@
 <div class="container mt-4">
 
     <h2>Novo Barbeiro</h2>
-
     <hr />
 
-    <form asp-action="Novo" method="post">
+    <form asp-action="Novo" method="post" enctype="multipart/form-data">
 
         <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
@@ -22,8 +21,13 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Telefone</label>
-            <input asp-for="Telefone" class="form-control" />
+            <label class="form-label">Telefone / WhatsApp</label>
+            <input asp-for="Telefone" class="form-control" placeholder="Ex: 27999999999" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Foto do Barbeiro</label>
+            <input type="file" name="foto" class="form-control" accept="image/*" />
         </div>
 
         <div class="mb-3">

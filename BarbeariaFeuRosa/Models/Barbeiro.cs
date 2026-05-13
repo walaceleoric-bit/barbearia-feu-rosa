@@ -6,7 +6,7 @@ namespace BarbeariaFeuRosa.Models
     {
         public int Id { get; set; }
 
-        public int BarbeariaId { get; set; } = 1;
+        public int BarbeariaId { get; set; } = 1; dotnet ef migrations add AdicionarFotoBarbeiro
 
         public Barbearia? Barbearia { get; set; }
 
@@ -14,6 +14,8 @@ namespace BarbeariaFeuRosa.Models
         public string Nome { get; set; } = string.Empty;
 
         public string Telefone { get; set; } = string.Empty;
+
+        public string FotoUrl { get; set; } = string.Empty;
 
         public string Especialidade { get; set; } = string.Empty;
 

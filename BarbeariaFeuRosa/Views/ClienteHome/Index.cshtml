@@ -59,7 +59,6 @@
 
             <hr />
 
-
             @{
                 var imagens = new List<string>();
 
@@ -69,7 +68,6 @@
                 if (ViewBag.Imagem4 != null) imagens.Add(ViewBag.Imagem4);
                 if (ViewBag.Imagem5 != null) imagens.Add(ViewBag.Imagem5);
             }
-
 
             <style>
                 .titulo-destaque {
@@ -151,6 +149,27 @@
                 .servico-valor {
                     font-size: 18px;
                     font-weight: 800;
+                }
+
+                .barbeiro-foto {
+                    width: 130px;
+                    height: 130px;
+                    object-fit: cover;
+                    border-radius: 50%;
+                    margin: 0 auto 15px auto;
+                    display: block;
+                }
+
+                .barbeiro-placeholder {
+                    width: 130px;
+                    height: 130px;
+                    border-radius: 50%;
+                    margin: 0 auto 15px auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 46px;
+                    background: rgba(255,255,255,.08);
                 }
             </style>
 
@@ -292,6 +311,92 @@
                     Escolher Serviço e Agendar
 
                 </a>
+
+            </div>
+
+
+            <div class="card cta-card">
+
+                <h4>
+                    👥 Nossos Barbeiros
+                </h4>
+
+                <p class="text-muted mt-2">
+                    Conheça os profissionais da barbearia e fale direto pelo WhatsApp.
+                </p>
+
+                <div class="row mt-4">
+
+                    @if (ViewBag.Barbeiros != null)
+                    {
+                        foreach (var barbeiro in ViewBag.Barbeiros)
+                        {
+                            var telefone = barbeiro.Telefone ?? "";
+
+                            telefone = telefone
+                                .Replace("(", "")
+                                .Replace(")", "")
+                                .Replace("-", "")
+                                .Replace(" ", "")
+                                .Replace(".", "");
+
+                            <div class="col-md-4 mb-4">
+
+                                <div class="card p-3 text-center h-100">
+
+                                    @if (!string.IsNullOrWhiteSpace(barbeiro.FotoUrl))
+                                    {
+                                        <img src="@barbeiro.FotoUrl"
+                                             class="barbeiro-foto" />
+                                    }
+                                    else
+                                    {
+                                        <div class="barbeiro-placeholder">
+                                            ✂
+                                        </div>
+                                    }
+
+                                    <h5>
+                                        @barbeiro.Nome
+                                    </h5>
+
+                                    @if (!string.IsNullOrWhiteSpace(barbeiro.Especialidade))
+                                    {
+                                        <p class="text-muted">
+                                            @barbeiro.Especialidade
+                                        </p>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(telefone))
+                                    {
+                                        <a href="https://wa.me/55@telefone"
+                                           target="_blank"
+                                           class="btn btn-success mt-2">
+
+                                            📲 Falar no WhatsApp
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Contato indisponível
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>
+                            Nenhum barbeiro cadastrado ainda.
+                        </p>
+                    }
+
+                </div>
 
             </div>
 

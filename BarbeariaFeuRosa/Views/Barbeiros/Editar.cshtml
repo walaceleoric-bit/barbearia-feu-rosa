@@ -16,9 +16,26 @@
 
     <hr />
 
-    <form asp-action="Editar" method="post">
+    <form asp-action="Editar" method="post" enctype="multipart/form-data">
 
         <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="FotoUrl" />
+
+        @if (!string.IsNullOrWhiteSpace(Model.FotoUrl))
+        {
+            <div class="mb-3">
+                <label>Foto Atual</label>
+                <br />
+                <img src="@Model.FotoUrl"
+                     class="rounded"
+                     style="max-width:140px; max-height:140px; object-fit:cover;" />
+            </div>
+        }
+
+        <div class="mb-3">
+            <label>Trocar Foto</label>
+            <input type="file" name="foto" class="form-control" accept="image/*" />
+        </div>
 
         <div class="mb-3">
             <label>Nome</label>
@@ -26,8 +43,8 @@
         </div>
 
         <div class="mb-3">
-            <label>Telefone</label>
-            <input asp-for="Telefone" class="form-control" />
+            <label>Telefone / WhatsApp</label>
+            <input asp-for="Telefone" class="form-control" placeholder="Ex: 27999999999" />
         </div>
 
         <div class="mb-3">
