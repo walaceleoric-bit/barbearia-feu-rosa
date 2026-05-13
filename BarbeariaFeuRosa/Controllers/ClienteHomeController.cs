@@ -112,6 +112,29 @@ namespace BarbeariaFeuRosa.Controllers
             ViewBag.Imagem3 = config?.CarrosselImagem3;
             ViewBag.Imagem4 = config?.CarrosselImagem4;
             ViewBag.Imagem5 = config?.CarrosselImagem5;
+
+
+            var ranking = _context.AvaliacoesBarbeiros
+                .Where(a => a.BarbeariaId == barbeariaId)
+                .GroupBy(a => new
+                {
+                    a.BarbeiroId,
+                    a.Barbeiro!.Nome,
+                    a.Barbeiro.FotoUrl
+                })
+                .Select(g => new
+                {
+                    Nome = g.Key.Nome,
+                    Foto = g.Key.FotoUrl,
+                    Media = g.Average(x => x.Nota),
+                    Total = g.Count()
+                })
+                .OrderByDescending(x => x.Media)
+                .ThenByDescending(x => x.Total)
+                .Take(3)
+                .ToList();
+
+            ViewBag.TopBarbeiros = ranking;
         }
     }
 }

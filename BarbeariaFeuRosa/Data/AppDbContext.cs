@@ -15,6 +15,8 @@ namespace BarbeariaFeuRosa.Data
 
         public DbSet<Servico> Servicos { get; set; }
 
+        public DbSet<AvaliacaoBarbeiro> AvaliacoesBarbeiros { get; set; }
+
         public DbSet<Configuracao> Configuracoes { get; set; }
 
         public DbSet<Usuario> Usuarios { get; set; }

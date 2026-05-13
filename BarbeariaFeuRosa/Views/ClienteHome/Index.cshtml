@@ -166,14 +166,9 @@
 
                     <div class="carrossel-area">
 
-                        <img id="imgAnterior"
-                             class="carrossel-img" />
-
-                        <img id="imgAtual"
-                             class="carrossel-img ativa" />
-
-                        <img id="imgProxima"
-                             class="carrossel-img" />
+                        <img id="imgAnterior" class="carrossel-img" />
+                        <img id="imgAtual" class="carrossel-img ativa" />
+                        <img id="imgProxima" class="carrossel-img" />
 
                     </div>
 
@@ -215,6 +210,7 @@
                 </script>
             }
 
+
             <div class="card promo-card">
 
                 <div class="promo-titulo">
@@ -226,6 +222,7 @@
                 </h4>
 
             </div>
+
 
             <div class="card cta-card">
 
@@ -245,6 +242,68 @@
                 </a>
 
             </div>
+
+
+            @if (ViewBag.TopBarbeiros != null && ViewBag.TopBarbeiros.Count > 0)
+            {
+                <div class="card cta-card">
+
+                    <h4>
+                        🏆 Top Barbeiros da Barbearia
+                    </h4>
+
+                    <p class="text-muted mt-2">
+                        Profissionais mais bem avaliados pelos clientes.
+                    </p>
+
+                    <div class="row mt-4">
+
+                        @{
+                            var posicao = 0;
+                            var medalhas = new[] { "🥇 Ouro", "🥈 Prata", "🥉 Bronze" };
+                        }
+
+                        @foreach (var barbeiro in ViewBag.TopBarbeiros)
+                        {
+                            <div class="col-md-4 mb-3">
+
+                                <div class="card p-4 text-center h-100">
+
+                                    <h5>
+                                        @medalhas[posicao]
+                                    </h5>
+
+                                    @if (!string.IsNullOrWhiteSpace(barbeiro.Foto))
+                                    {
+                                        <img src="@barbeiro.Foto"
+                                             class="rounded-circle mx-auto my-3"
+                                             style="width:110px; height:110px; object-fit:cover;" />
+                                    }
+
+                                    <h5>
+                                        @barbeiro.Nome
+                                    </h5>
+
+                                    <strong>
+                                        ⭐ @barbeiro.Media.ToString("N1")
+                                    </strong>
+
+                                    <small class="text-muted mt-2">
+                                        @barbeiro.Total avaliações
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                            posicao++;
+                        }
+
+                    </div>
+
+                </div>
+            }
+
 
             <div class="card cta-card">
 
@@ -274,12 +333,6 @@
 
                             </div>
                         }
-                    }
-                    else
-                    {
-                        <p>
-                            Nenhum serviço cadastrado ainda.
-                        </p>
                     }
 
                 </div>
