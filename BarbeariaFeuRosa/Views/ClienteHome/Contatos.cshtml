@@ -107,7 +107,7 @@
 
                                 @if (!string.IsNullOrWhiteSpace(telefone))
                                 {
-                                    <a href="https://wa.me/55@telefone"
+                                    <a href="@($"https://api.whatsapp.com/send?phone=55{telefone}")"
                                        target="_blank"
                                        class="btn btn-success mt-3">
                                         📲 Chamar no WhatsApp
