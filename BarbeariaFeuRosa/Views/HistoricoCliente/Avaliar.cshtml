@@ -1,0 +1,69 @@
+@model BarbeariaFeuRosa.Models.Agendamento
+
+@{
+    ViewData["Title"] = "Avaliar Barbeiro";
+}
+
+<div class="container p-4" style="max-width:700px;">
+
+    <h2>⭐ Avaliar Barbeiro</h2>
+
+    <p class="text-muted">
+        Avalie o atendimento recebido.
+    </p>
+
+    <hr />
+
+    <div class="card p-4 mb-4">
+
+        <h4>
+            @Model.Barbeiro?.Nome
+        </h4>
+
+        <p>
+            Serviço: <strong>@Model.Servico</strong>
+        </p>
+
+        <p>
+            Data: @Model.DataHora.ToString("dd/MM/yyyy HH:mm")
+        </p>
+
+    </div>
+
+    <form asp-action="Avaliar" method="post">
+
+        <input type="hidden" name="agendamentoId" value="@Model.Id" />
+
+        <div class="mb-3">
+            <label>Nota</label>
+
+            <select name="nota" class="form-control" required>
+                <option value="">Escolha uma nota...</option>
+                <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                <option value="4">⭐⭐⭐⭐ Muito bom</option>
+                <option value="3">⭐⭐⭐ Bom</option>
+                <option value="2">⭐⭐ Regular</option>
+                <option value="1">⭐ Ruim</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Comentário opcional</label>
+
+            <textarea name="comentario"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Escreva um comentário sobre o atendimento..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            Enviar Avaliação
+        </button>
+
+        <a href="/HistoricoCliente/Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+
+    </form>
+
+</div>
