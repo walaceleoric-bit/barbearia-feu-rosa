@@ -2,78 +2,37 @@
 
 @{
     ViewData["Title"] = "Meu Histórico";
-}
-
-<div class="container-fluid p-4">
-
-    <div class="d-flex justify-content-between align-items-center">
-        <h2>Meu Histórico</h2>
-
-        <div>
-            <a href="/HistoricoCliente/Limpar"
-                   class="btn btn-danger"
-                   onclick="return confirm('Deseja apagar todo o seu histórico?');">
-                Limpar Histórico
-            </a>
-
-            <a href="/ClienteHome/Index" class="btn btn-outline-dark">
-                ← Voltar
-            </a>
-        </div>
-    </div>
-
-    <hr />
-
-    <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Data</th>
-                <th>Barbeiro</th>
-                <th>Serviço</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th width="120">Ações</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>@item.Barbeiro?.Nome</td>
-                    <td>@item.Servico</td>
-                    <td>R$ @item.Valor.ToString("N2")</td>
-                    <td>@item.Status</td>
-                    <td>
-                        <a href="/HistoricoCliente/Excluir/@item.Id"
-                               class="btn btn-sm btn-danger"
-                               onclick="return confirm('Excluir este agendamento do histórico?');">
-                            Excluir@model List<BarbeariaFeuRosa.Models.Agendamento>
-
-@{
-    ViewData["Title"] = "Meu Histórico";
 
     var avaliacoesFeitas =
-        ViewBag.AvaliacoesFeitas as List<string> ?? new List<string>();
+        ViewBag.AvaliacoesFeitas as List<string>
+        ?? new List<string>();
 }
 
 <div class="container-fluid p-4">
 
     <div class="d-flex justify-content-between align-items-center">
+
         <h2>Meu Histórico</h2>
 
         <div>
+
             <a href="/HistoricoCliente/Limpar"
                class="btn btn-danger"
                onclick="return confirm('Deseja apagar todo o seu histórico?');">
+
                 Limpar Histórico
+
             </a>
 
-            <a href="/ClienteHome/Index" class="btn btn-outline-dark">
+            <a href="/ClienteHome/Index"
+               class="btn btn-outline-dark">
+
                 ← Voltar
+
             </a>
+
         </div>
+
     </div>
 
     <hr />
@@ -93,66 +52,89 @@
     }
 
     <table class="table table-bordered table-hover">
+
         <thead class="table-dark">
+
             <tr>
+
                 <th>Data</th>
                 <th>Barbeiro</th>
                 <th>Serviço</th>
                 <th>Valor</th>
                 <th>Status</th>
                 <th width="220">Ações</th>
+
             </tr>
+
         </thead>
 
         <tbody>
-            @foreach (var item in Model)
+
+            @foreach (var agendamento in Model)
             {
-                var chaveAvaliacao = item.BarbeiroId + "-" + item.ClienteId;
-                var jaAvaliou = avaliacoesFeitas.Contains(chaveAvaliacao);
+                var chaveAvaliacao =
+                    agendamento.BarbeiroId + "-" + agendamento.ClienteId;
+
+                var jaAvaliou =
+                    avaliacoesFeitas.Contains(chaveAvaliacao);
 
                 <tr>
-                    <td>@item.DataHora.ToString("dd/MM/yyyy HH:mm")</td>
-
-                    <td>@item.Barbeiro?.Nome</td>
-
-                    <td>@item.Servico</td>
-
-                    <td>R$ @item.Valor.ToString("N2")</td>
-
-                    <td>@item.Status</td>
 
                     <td>
-                        @if (item.Status == "Finalizado" && !jaAvaliou)
+                        @agendamento.DataHora.ToString("dd/MM/yyyy HH:mm")
+                    </td>
+
+                    <td>
+                        @agendamento.Barbeiro?.Nome
+                    </td>
+
+                    <td>
+                        @agendamento.Servico
+                    </td>
+
+                    <td>
+                        R$ @agendamento.Valor.ToString("N2")
+                    </td>
+
+                    <td>
+                        @agendamento.Status
+                    </td>
+
+                    <td>
+
+                        @if (agendamento.Status == "Finalizado" && !jaAvaliou)
                         {
-                            <a href="/HistoricoCliente/Avaliar/@item.Id"
+                            <a href="/HistoricoCliente/Avaliar/@agendamento.Id"
                                class="btn btn-sm btn-warning mb-1">
+
                                 ⭐ Avaliar
+
                             </a>
                         }
-                        else if (item.Status == "Finalizado" && jaAvaliou)
+                        else if (agendamento.Status == "Finalizado" && jaAvaliou)
                         {
                             <span class="badge bg-success mb-1">
+
                                 Avaliado
+
                             </span>
                         }
 
-                        <a href="/HistoricoCliente/Excluir/@item.Id"
+                        <a href="/HistoricoCliente/Excluir/@agendamento.Id"
                            class="btn btn-sm btn-danger"
                            onclick="return confirm('Excluir este agendamento do histórico?');">
-                            Excluir
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 
-</div>
+                            Excluir
+
                         </a>
+
                     </td>
+
                 </tr>
             }
+
         </tbody>
+
     </table>
 
 </div>
