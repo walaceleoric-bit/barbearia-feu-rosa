@@ -27,10 +27,11 @@
         + Novo Barbeiro
     </a>
 
-    <table class="table table-bordered">
+    <table class="table table-bordered align-middle">
 
         <thead>
             <tr>
+                <th width="100">Foto</th>
                 <th>Nome</th>
                 <th>Telefone</th>
                 <th>Especialidade</th>
@@ -46,13 +47,51 @@
             {
                 <tr>
 
-                    <td>@item.Nome</td>
+                    <td class="text-center">
 
-                    <td>@item.Telefone</td>
+                        @if (!string.IsNullOrWhiteSpace(item.FotoUrl))
+                        {
+                            <img src="@item.FotoUrl"
+                                 style="
+                                     width:70px;
+                                     height:70px;
+                                     object-fit:cover;
+                                     border-radius:50%;
+                                     border:2px solid rgba(255,255,255,.15);" />
+                        }
+                        else
+                        {
+                            <div style="
+                                 width:70px;
+                                 height:70px;
+                                 border-radius:50%;
+                                 display:flex;
+                                 align-items:center;
+                                 justify-content:center;
+                                 margin:auto;
+                                 background:rgba(255,255,255,.08);
+                                 font-size:26px;">
+                                ✂
+                            </div>
+                        }
 
-                    <td>@item.Especialidade</td>
+                    </td>
 
-                    <td>@item.ComissaoPercentual %</td>
+                    <td>
+                        @item.Nome
+                    </td>
+
+                    <td>
+                        @item.Telefone
+                    </td>
+
+                    <td>
+                        @item.Especialidade
+                    </td>
+
+                    <td>
+                        @item.ComissaoPercentual %
+                    </td>
 
                     <td>
                         @(item.Ativo ? "Ativo" : "Inativo")
@@ -61,15 +100,15 @@
                     <td>
 
                         <a asp-action="Editar"
-                               asp-route-id="@item.Id"
-                               class="btn btn-sm btn-primary">
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-primary">
                             Editar
                         </a>
 
                         <a asp-action="Excluir"
-                               asp-route-id="@item.Id"
-                               class="btn btn-sm btn-danger"
-                               onclick="return confirm('Deseja excluir?')">
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Deseja excluir?')">
                             Excluir
                         </a>
 
