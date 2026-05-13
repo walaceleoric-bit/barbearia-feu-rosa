@@ -39,13 +39,17 @@
                 📖 Histórico
             </a>
 
+            <a href="#barbeiros"
+               class="text-white text-decoration-none d-block mb-3">
+                💈 Contato Barbeiros
+            </a>
+
             <a href="/Auth/Sair"
                class="text-white text-decoration-none d-block mt-5">
                 🚪 Sair
             </a>
 
         </div>
-
 
         <div class="col-10 p-4">
 
@@ -70,6 +74,10 @@
             }
 
             <style>
+                html {
+                    scroll-behavior: smooth;
+                }
+
                 .titulo-destaque {
                     font-size: 28px;
                     font-weight: 700;
@@ -173,7 +181,6 @@
                 }
             </style>
 
-
             @if (imagens.Any())
             {
                 <div class="titulo-destaque">
@@ -233,7 +240,6 @@
                 </script>
             }
 
-
             <div class="card promo-card">
 
                 <div class="promo-titulo">
@@ -245,7 +251,6 @@
                 </h4>
 
             </div>
-
 
             <div class="card cta-card">
 
@@ -265,7 +270,6 @@
                 </a>
 
             </div>
-
 
             <div class="card cta-card">
 
@@ -314,8 +318,7 @@
 
             </div>
 
-
-            <div class="card cta-card">
+            <div id="barbeiros" class="card cta-card">
 
                 <h4>
                     👥 Nossos Barbeiros
