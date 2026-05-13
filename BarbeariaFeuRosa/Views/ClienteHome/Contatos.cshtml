@@ -1,0 +1,141 @@
+@{
+    ViewData["Title"] = "Contato Barbeiros";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+
+        <div class="col-2 bg-dark text-white vh-100 p-3">
+
+            <div class="text-center mb-4">
+
+                @if (ViewBag.Logo != null)
+                {
+                    <img src="@ViewBag.Logo"
+                         style="max-width:120px;" />
+                }
+
+                <h5 class="mt-3">
+                    @ViewBag.NomeBarbearia
+                </h5>
+
+            </div>
+
+            <hr />
+
+            <a href="/ClienteHome/Index"
+               class="text-white text-decoration-none d-block mb-3">
+                🏠 Início
+            </a>
+
+            <a href="/AgendamentoOnline/Index"
+               class="text-white text-decoration-none d-block mb-3">
+                📅 Agendar
+            </a>
+
+            <a href="/HistoricoCliente/Index"
+               class="text-white text-decoration-none d-block mb-3">
+                📖 Histórico
+            </a>
+
+            <a href="/ClienteHome/Contatos"
+               class="text-white text-decoration-none d-block mb-3 menu-ativo">
+                💈 Contato Barbeiros
+            </a>
+
+            <a href="/Auth/Sair"
+               class="text-white text-decoration-none d-block mt-5">
+                🚪 Sair
+            </a>
+
+        </div>
+
+        <div class="col-10 p-4">
+
+            <h2>💈 Contato dos Barbeiros</h2>
+
+            <p class="text-muted">
+                Escolha seu barbeiro e fale diretamente pelo WhatsApp.
+            </p>
+
+            <hr />
+
+            <div class="row">
+
+                @if (ViewBag.Barbeiros != null && ViewBag.Barbeiros.Count > 0)
+                {
+                    foreach (var barbeiro in ViewBag.Barbeiros)
+                    {
+                        var telefone = barbeiro.Telefone ?? "";
+
+                        telefone = telefone
+                            .Replace("(", "")
+                            .Replace(")", "")
+                            .Replace("-", "")
+                            .Replace(" ", "")
+                            .Replace(".", "");
+
+                        <div class="col-md-4 mb-4">
+
+                            <div class="card p-4 text-center h-100">
+
+                                @if (!string.IsNullOrWhiteSpace(barbeiro.FotoUrl))
+                                {
+                                    <img src="@barbeiro.FotoUrl"
+                                         class="rounded-circle mx-auto mb-3"
+                                         style="width:140px; height:140px; object-fit:cover;" />
+                                }
+                                else
+                                {
+                                    <div class="mx-auto mb-3 d-flex align-items-center justify-content-center"
+                                         style="width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,.08); font-size:45px;">
+                                        ✂
+                                    </div>
+                                }
+
+                                <h4>
+                                    @barbeiro.Nome
+                                </h4>
+
+                                @if (!string.IsNullOrWhiteSpace(barbeiro.Especialidade))
+                                {
+                                    <p class="text-muted">
+                                        @barbeiro.Especialidade
+                                    </p>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(telefone))
+                                {
+                                    <a href="https://wa.me/55@telefone"
+                                       target="_blank"
+                                       class="btn btn-success mt-3">
+                                        📲 Chamar no WhatsApp
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted mt-3">
+                                        Contato não informado
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="card p-4">
+                        Nenhum barbeiro cadastrado ainda.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

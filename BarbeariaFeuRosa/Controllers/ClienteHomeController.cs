@@ -30,7 +30,7 @@ namespace BarbeariaFeuRosa.Controllers
             CarregarTelaCliente(barbeariaId.Value);
 
             ViewBag.NomeCliente =
-    HttpContext.Session.GetString("UsuarioNome");
+                HttpContext.Session.GetString("UsuarioNome");
 
             ViewBag.Servicos = _context.Servicos
                 .Where(s =>
@@ -40,6 +40,31 @@ namespace BarbeariaFeuRosa.Controllers
                 .ToList();
 
             ViewBag.ModoPreview = false;
+
+            return View();
+        }
+
+        public IActionResult Contatos()
+        {
+            if (HttpContext.Session.GetString("UsuarioTipo") != "CLIENTE")
+                return RedirectToAction("Login", "Auth");
+
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+            CarregarTelaCliente(barbeariaId.Value);
+
+            ViewBag.Barbeiros = _context.Barbeiros
+                .Where(b =>
+                    b.BarbeariaId == barbeariaId.Value &&
+                    b.Ativo)
+                .OrderBy(b => b.Nome)
+                .ToList();
+
+            ViewBag.NomeCliente =
+                HttpContext.Session.GetString("UsuarioNome");
 
             return View();
         }
