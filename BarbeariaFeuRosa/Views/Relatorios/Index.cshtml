@@ -1,0 +1,370 @@
+@{
+    ViewData["Title"] = "Relatórios";
+}
+
+<div class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2>📊 Central de Inteligência</h2>
+            <p class="text-muted mb-0">
+                Relatórios estratégicos para entender clientes, barbeiros e serviços.
+            </p>
+        </div>
+
+        <a href="/Dashboard" class="btn btn-outline-dark">
+            ← Voltar
+        </a>
+    </div>
+
+    <hr />
+
+    <style>
+        .rel-card {
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            border-radius: 18px;
+            padding: 22px;
+            height: 100%;
+        }
+
+        .kpi-card h6 {
+            opacity: .8;
+            margin-bottom: 10px;
+        }
+
+        .kpi-card h2 {
+            font-weight: 800;
+        }
+
+        .ranking-card {
+            border-radius: 18px;
+            padding: 20px;
+            height: 100%;
+            text-align: center;
+        }
+
+        .cliente-alerta {
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,.06);
+        }
+
+        .comentario-box {
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+            background: rgba(255,255,255,.06);
+        }
+    </style>
+
+    <div class="row mb-4">
+
+        <div class="col-md-3 mb-3">
+            <div class="card kpi-card">
+                <h6>⭐ Média Geral</h6>
+                <h2>@ViewBag.MediaGeral</h2>
+                <small class="text-muted">
+                    Nota média da barbearia
+                </small>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card kpi-card">
+                <h6>💬 Avaliações</h6>
+                <h2>@ViewBag.TotalAvaliacoes</h2>
+                <small class="text-muted">
+                    Feedbacks recebidos
+                </small>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card kpi-card">
+                <h6>⚠ Clientes em risco</h6>
+                <h2>@ViewBag.ClientesSumidos.Count</h2>
+                <small class="text-muted">
+                    Sem voltar há 30+ dias
+                </small>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card kpi-card">
+                <h6>✂ Serviços fortes</h6>
+                <h2>@ViewBag.ServicosMaisFeitos.Count</h2>
+                <small class="text-muted">
+                    Serviços com histórico
+                </small>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card rel-card">
+
+        <h4>🏆 Ranking dos Barbeiros</h4>
+        <p class="text-muted">
+            Top profissionais com base nas avaliações reais dos clientes.
+        </p>
+
+        <div class="row mt-4">
+
+            @{
+                var posicao = 0;
+                var medalhas = new[] { "🥇 Ouro", "🥈 Prata", "🥉 Bronze" };
+            }
+
+            @foreach (var item in ViewBag.TopBarbeiros)
+            {
+                <div class="col-md-4 mb-3">
+
+                    <div class="card ranking-card">
+
+                        <h5>@medalhas[posicao]</h5>
+
+                        <h4 class="mt-3">
+                            @item.Nome
+                        </h4>
+
+                        <h2>
+                            ⭐ @item.Media.ToString("N1")
+                        </h2>
+
+                        <small class="text-muted">
+                            @item.Total avaliações
+                        </small>
+
+                    </div>
+
+                </div>
+
+                posicao++;
+            }
+
+            @if (ViewBag.TopBarbeiros.Count == 0)
+            {
+                <p class="text-muted">
+                    Ainda não existem avaliações suficientes para montar o ranking.
+                </p>
+            }
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <div class="card rel-card">
+
+                <h4>📲 Clientes para recuperar</h4>
+
+                <p class="text-muted">
+                    Clientes que já finalizaram atendimento, mas estão há mais de 30 dias sem voltar.
+                </p>
+
+                <hr />
+
+                @if (ViewBag.ClientesSumidos.Count > 0)
+                {
+                    foreach (var item in ViewBag.ClientesSumidos)
+                    {
+                        var risco = item.DiasSemVoltar >= 60 ? "🔴 Perdido" : "🟡 Em risco";
+
+                        <div class="cliente-alerta">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <strong>
+                                    @item.Cliente
+                                </strong>
+
+                                <span class="badge bg-warning text-dark">
+                                    @risco
+                                </span>
+
+                            </div>
+
+                            <small>
+                                Última visita: @item.UltimaVisita.ToString("dd/MM/yyyy")
+                                <br />
+                                Está há <strong>@item.DiasSemVoltar dias</strong> sem voltar.
+                                <br />
+                                Sugestão de retorno: @item.SugestaoRetorno.ToString("dd/MM/yyyy")
+                            </small>
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">
+                        Nenhum cliente em risco no momento.
+                    </p>
+                }
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <div class="card rel-card">
+
+                <h4>💬 Feedback dos Clientes</h4>
+
+                <p class="text-muted">
+                    Comentários reais enviados após os atendimentos.
+                </p>
+
+                <hr />
+
+                @if (ViewBag.Avaliacoes.Count > 0)
+                {
+                    foreach (var item in ViewBag.Avaliacoes)
+                    {
+                        <div class="comentario-box">
+
+                            <strong>
+                                @item.Cliente?.Nome
+                            </strong>
+
+                            <span class="text-muted">
+                                avaliou
+                            </span>
+
+                            <strong>
+                                @item.Barbeiro?.Nome
+                            </strong>
+
+                            <span>
+                                ⭐ @item.Nota
+                            </span>
+
+                            @if (!string.IsNullOrWhiteSpace(item.Comentario))
+                            {
+                                <p class="mt-2 mb-0">
+                                    “@item.Comentario”
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="text-muted mt-2 mb-0">
+                                    Sem comentário escrito.
+                                </p>
+                            }
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">
+                        Ainda não existem comentários de clientes.
+                    </p>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card rel-card">
+
+        <h4>👥 Comportamento dos Clientes</h4>
+
+        <p class="text-muted">
+            Entenda quem é fiel, quem cancela, quem atrasa e quem precisa de atenção.
+        </p>
+
+        <hr />
+
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Cliente</th>
+                    <th>Perfil</th>
+                    <th>Total</th>
+                    <th>Finalizados</th>
+                    <th>Cancelados</th>
+                    <th>Atrasados</th>
+                    <th>Última Visita</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in ViewBag.ClientesResumo)
+                {
+                    var perfil = "Novo";
+
+                    if (item.Finalizados >= 6)
+                        perfil = "👑 VIP";
+                    else if (item.Finalizados >= 3)
+                        perfil = "🔥 Recorrente";
+                    else if (item.Cancelados >= 2)
+                        perfil = "⚠ Cancela muito";
+                    else if (item.Atrasados >= 2)
+                        perfil = "⏰ Atrasa muito";
+
+                    <tr>
+                        <td>@item.Cliente</td>
+                        <td>@perfil</td>
+                        <td>@item.Total</td>
+                        <td>@item.Finalizados</td>
+                        <td>@item.Cancelados</td>
+                        <td>@item.Atrasados</td>
+                        <td>
+                            @(item.UltimaVisita == DateTime.MinValue
+                                ? "Ainda não finalizou"
+                                : item.UltimaVisita.ToString("dd/MM/yyyy"))
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="card rel-card">
+
+        <h4>✂ Serviços mais realizados</h4>
+
+        <p class="text-muted">
+            Veja quais serviços têm mais saída e maior faturamento.
+        </p>
+
+        <hr />
+
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Serviço</th>
+                    <th>Total realizado</th>
+                    <th>Faturamento</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in ViewBag.ServicosMaisFeitos)
+                {
+                    <tr>
+                        <td>@item.Servico</td>
+                        <td>@item.Total</td>
+                        <td>R$ @item.Faturamento.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
