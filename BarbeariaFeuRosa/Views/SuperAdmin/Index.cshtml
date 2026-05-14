@@ -9,17 +9,13 @@
         </h2>
 
         <div>
-
-            <a href="/SuperAdmin/Nova"
-               class="btn btn-success">
+            <a href="/SuperAdmin/Nova" class="btn btn-success">
                 + Nova
             </a>
 
-            <a href="/SuperAdmin/Sair"
-               class="btn btn-danger">
+            <a href="/SuperAdmin/Sair" class="btn btn-danger">
                 Sair
             </a>
-
         </div>
 
     </div>
@@ -38,15 +34,18 @@
         </div>
     }
 
-    <table class="table table-dark table-bordered">
+    <table class="table table-dark table-bordered align-middle">
 
         <thead>
             <tr>
                 <th>Nome</th>
                 <th>Slug</th>
                 <th>Plano</th>
+                <th>Mensalidade</th>
                 <th>Vencimento</th>
+                <th>Pagamento</th>
                 <th>Status</th>
+                <th>Observação</th>
                 <th width="300">Ações</th>
             </tr>
         </thead>
@@ -59,18 +58,34 @@
 
                     <td>@item.Nome</td>
 
-                    <td>
-                        /@item.Slug
-                    </td>
+                    <td>/@item.Slug</td>
 
                     <td>@item.Plano</td>
+
+                    <td>
+                        R$ @item.ValorMensalidade.ToString("N2")
+                    </td>
 
                     <td>
                         @item.DataVencimento.ToString("dd/MM/yyyy")
                     </td>
 
                     <td>
+                        @if (item.PagamentoEmDia)
+                        {
+                            <span class="badge bg-success">
+                                Em dia
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">
+                                Pendente
+                            </span>
+                        }
+                    </td>
 
+                    <td>
                         @if (item.Ativa)
                         {
                             <span class="badge bg-success">
@@ -83,7 +98,17 @@
                                 Bloqueada
                             </span>
                         }
+                    </td>
 
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(item.Observacao))
+                        {
+                            <span>@item.Observacao</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sem observação</span>
+                        }
                     </td>
 
                     <td>

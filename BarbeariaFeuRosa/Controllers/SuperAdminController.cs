@@ -90,7 +90,6 @@ namespace BarbeariaFeuRosa.Controllers
             _context.SaveChanges();
 
             TempData["Sucesso"] = "Barbearia criada com sucesso!";
-
             return RedirectToAction("Index");
         }
 
@@ -102,27 +101,59 @@ namespace BarbeariaFeuRosa.Controllers
             var barbearia = _context.Barbearias.Find(id);
 
             if (barbearia == null)
+            {
+                TempData["Erro"] = "Barbearia não encontrada.";
                 return RedirectToAction("Index");
+            }
 
             return View(barbearia);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Editar(Barbearia barbearia)
         {
             if (HttpContext.Session.GetString("SuperAdmin") != "SIM")
                 return RedirectToAction("Login");
 
-            barbearia.Slug = barbearia.Slug
+            var barbeariaBanco = _context.Barbearias
+                .FirstOrDefault(b => b.Id == barbearia.Id);
+
+            if (barbeariaBanco == null)
+            {
+                TempData["Erro"] = "Barbearia não encontrada.";
+                return RedirectToAction("Index");
+            }
+
+            var novoSlug = barbearia.Slug
                 .Trim()
                 .ToLower()
                 .Replace(" ", "-");
 
-            _context.Barbearias.Update(barbearia);
+            bool slugExiste = _context.Barbearias
+                .Any(b => b.Slug == novoSlug && b.Id != barbearia.Id);
+
+            if (slugExiste)
+            {
+                TempData["Erro"] = "Este slug já está sendo usado por outra barbearia.";
+                return View(barbearia);
+            }
+
+            barbeariaBanco.Nome = barbearia.Nome;
+            barbeariaBanco.Slug = novoSlug;
+            barbeariaBanco.Plano = barbearia.Plano;
+            barbeariaBanco.ValorMensalidade = barbearia.ValorMensalidade;
+            barbeariaBanco.DataVencimento = DateTime.SpecifyKind(
+                barbearia.DataVencimento,
+                DateTimeKind.Utc
+            );
+            barbeariaBanco.Observacao = barbearia.Observacao;
+            barbeariaBanco.Ativa = barbearia.Ativa;
+            barbeariaBanco.PagamentoEmDia = barbearia.PagamentoEmDia;
+
             _context.SaveChanges();
 
             TempData["Sucesso"] = "Barbearia atualizada com sucesso!";
-
             return RedirectToAction("Index");
         }
 
@@ -185,7 +216,7 @@ namespace BarbeariaFeuRosa.Controllers
             }
             catch
             {
-                TempData["Erro"] = "Não foi possível excluir esta barbearia porque existem dados vinculados a ela, como clientes, barbeiros, agendamentos ou financeiro.";
+                TempData["Erro"] = "Não foi possível excluir esta barbearia porque existem dados vinculados a ela.";
             }
 
             return RedirectToAction("Index");
