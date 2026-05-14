@@ -49,39 +49,37 @@
                 ⭐ Avaliar Barbeiro
             </a>
 
-            @if (ViewBag.TopBarbeiros != null && ViewBag.TopBarbeiros.Count > 0)
-            {
-                <hr />
+           @if (ViewBag.TopBarbeiros != null && ViewBag.TopBarbeiros.Count > 0)
+{
+    <hr />
 
-                <h6 class="mb-3">
-                    🏆 Top 3
-                </h6>
+    <h6 class="mb-3">
+        🏆 Top 3
+    </h6>
 
-                @{
-                    var posicaoLateral = 0;
-                    var medalhasLateral = new[] { "🥇", "🥈", "🥉" };
-                }
+    var posicaoLateral = 0;
+    var medalhasLateral = new[] { "🥇", "🥈", "🥉" };
 
-                foreach (var barbeiro in ViewBag.TopBarbeiros)
-                {
-                    <div class="mb-3 p-2 rounded"
-                         style="background:rgba(255,255,255,.06);">
+    foreach (var barbeiro in ViewBag.TopBarbeiros)
+    {
+        <div class="mb-3 p-2 rounded"
+             style="background:rgba(255,255,255,.06);">
 
-                        <strong>
-                            @medalhasLateral[posicaoLateral] @barbeiro.Nome
-                        </strong>
+            <strong>
+                @medalhasLateral[posicaoLateral] @barbeiro.Nome
+            </strong>
 
-                        <div style="font-size:13px;">
-                            ⭐ @barbeiro.Media.ToString("N1")
-                            <br />
-                            @barbeiro.Total avaliações
-                        </div>
+            <div style="font-size:13px;">
+                ⭐ @barbeiro.Media.ToString("N1")
+                <br />
+                @barbeiro.Total avaliações
+            </div>
 
-                    </div>
+        </div>
 
-                    posicaoLateral++;
-                }
-            }
+        posicaoLateral++;
+    }
+}
 
             <a href="/Auth/Sair"
                class="text-white text-decoration-none d-block mt-5">
