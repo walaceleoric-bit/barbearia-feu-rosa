@@ -74,6 +74,17 @@ namespace BarbeariaFeuRosa.Controllers
                 return View(barbearia);
             }
 
+            bool loginExiste = _context.Usuarios
+                .Any(u =>
+                    u.UsuarioLogin == usuarioAdm &&
+                    u.Tipo == "ADM");
+
+            if (loginExiste)
+            {
+                ViewBag.Erro = "Este login de administrador já está em uso.";
+                return View(barbearia);
+            }
+
             _context.Barbearias.Add(barbearia);
             _context.SaveChanges();
 
@@ -106,12 +117,22 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Index");
             }
 
+            var usuarioAdm = _context.Usuarios
+                .FirstOrDefault(u =>
+                    u.BarbeariaId == id &&
+                    u.Tipo == "ADM");
+
+            ViewBag.UsuarioAdm = usuarioAdm;
+
             return View(barbearia);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Editar(Barbearia barbearia)
+        public IActionResult Editar(
+            Barbearia barbearia,
+            string novoLoginAdm,
+            string novaSenhaAdm)
         {
             if (HttpContext.Session.GetString("SuperAdmin") != "SIM")
                 return RedirectToAction("Login");
@@ -136,7 +157,51 @@ namespace BarbeariaFeuRosa.Controllers
             if (slugExiste)
             {
                 TempData["Erro"] = "Este slug já está sendo usado por outra barbearia.";
+
+                ViewBag.UsuarioAdm = _context.Usuarios
+                    .FirstOrDefault(u =>
+                        u.BarbeariaId == barbearia.Id &&
+                        u.Tipo == "ADM");
+
                 return View(barbearia);
+            }
+
+            var usuarioAdm = _context.Usuarios
+                .FirstOrDefault(u =>
+                    u.BarbeariaId == barbearia.Id &&
+                    u.Tipo == "ADM");
+
+            if (usuarioAdm != null && !string.IsNullOrWhiteSpace(novoLoginAdm))
+            {
+                novoLoginAdm = novoLoginAdm.Trim();
+
+                bool loginExiste = _context.Usuarios
+                    .Any(u =>
+                        u.UsuarioLogin == novoLoginAdm &&
+                        u.Id != usuarioAdm.Id);
+
+                if (loginExiste)
+                {
+                    TempData["Erro"] = "Este login já está sendo usado por outro usuário.";
+
+                    ViewBag.UsuarioAdm = usuarioAdm;
+                    return View(barbearia);
+                }
+
+                usuarioAdm.UsuarioLogin = novoLoginAdm;
+            }
+
+            if (usuarioAdm != null && !string.IsNullOrWhiteSpace(novaSenhaAdm))
+            {
+                if (novaSenhaAdm.Length > 6)
+                {
+                    TempData["Erro"] = "A senha do administrador deve ter no máximo 6 caracteres.";
+
+                    ViewBag.UsuarioAdm = usuarioAdm;
+                    return View(barbearia);
+                }
+
+                usuarioAdm.Senha = novaSenhaAdm;
             }
 
             barbeariaBanco.Nome = barbearia.Nome;
@@ -187,6 +252,27 @@ namespace BarbeariaFeuRosa.Controllers
                 barbearia.PagamentoEmDia = true;
                 barbearia.DataVencimento = DateTime.UtcNow.AddDays(30);
                 _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult ConfirmarPagamento(int id)
+        {
+            if (HttpContext.Session.GetString("SuperAdmin") != "SIM")
+                return RedirectToAction("Login");
+
+            var barbearia = _context.Barbearias.Find(id);
+
+            if (barbearia != null)
+            {
+                barbearia.PagamentoEmDia = true;
+                barbearia.Ativa = true;
+                barbearia.DataVencimento = DateTime.UtcNow.AddDays(30);
+
+                _context.SaveChanges();
+
+                TempData["Sucesso"] = "Pagamento confirmado com sucesso!";
             }
 
             return RedirectToAction("Index");
