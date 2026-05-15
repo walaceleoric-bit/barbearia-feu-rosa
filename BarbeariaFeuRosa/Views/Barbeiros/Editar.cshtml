@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Editar Barbeiro";
+
+    var usuarioBarbeiro =
+        ViewBag.UsuarioBarbeiro as BarbeariaFeuRosa.Models.Usuario;
 }
 
 <div class="container p-4">
@@ -55,6 +58,32 @@
         <div class="mb-3">
             <label>Comissão %</label>
             <input asp-for="ComissaoPercentual" class="form-control" />
+        </div>
+
+        <hr />
+
+        <h5 class="mb-3">
+            🔐 Acesso do Barbeiro
+        </h5>
+
+        <div class="mb-3">
+            <label>Login do Barbeiro</label>
+            <input name="usuarioLogin"
+                   class="form-control"
+                   value="@usuarioBarbeiro?.UsuarioLogin"
+                   placeholder="Ex: joao" />
+        </div>
+
+        <div class="mb-3">
+            <label>Nova senha do Barbeiro</label>
+            <input name="novaSenha"
+                   class="form-control"
+                   maxlength="6"
+                   placeholder="Digite nova senha ou deixe vazio" />
+
+            <small class="text-muted">
+                Se deixar vazio, a senha atual será mantida.
+            </small>
         </div>
 
         <div class="form-check mb-3">

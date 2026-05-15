@@ -129,13 +129,23 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Index");
             }
 
+            var usuarioBarbeiro = _context.Usuarios
+                .FirstOrDefault(u =>
+                    u.BarbeiroId == barbeiro.Id &&
+                    u.BarbeariaId == barbeariaId.Value &&
+                    u.Tipo == "BARBEIRO");
+
+            ViewBag.UsuarioBarbeiro = usuarioBarbeiro;
+
             return View(barbeiro);
         }
 
         [HttpPost]
         public IActionResult Editar(
             Barbeiro barbeiro,
-            IFormFile? foto)
+            IFormFile? foto,
+            string usuarioLogin,
+            string novaSenha)
         {
             var barbeariaId = ObterBarbeariaId();
 
@@ -144,9 +154,6 @@ namespace BarbeariaFeuRosa.Controllers
 
             ModelState.Remove("Barbearia");
             ModelState.Remove("BarbeariaId");
-
-            if (!ModelState.IsValid)
-                return View(barbeiro);
 
             var barbeiroBanco = _context.Barbeiros
                 .FirstOrDefault(b =>
@@ -159,6 +166,35 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Index");
             }
 
+            var usuario = _context.Usuarios
+                .FirstOrDefault(u =>
+                    u.BarbeiroId == barbeiroBanco.Id &&
+                    u.BarbeariaId == barbeariaId.Value &&
+                    u.Tipo == "BARBEIRO");
+
+            if (!string.IsNullOrWhiteSpace(novaSenha) && novaSenha.Length > 6)
+                ModelState.AddModelError("", "A nova senha deve ter no máximo 6 caracteres.");
+
+            if (usuario != null && !string.IsNullOrWhiteSpace(usuarioLogin))
+            {
+                usuarioLogin = usuarioLogin.Trim();
+
+                bool loginExiste = _context.Usuarios
+                    .Any(u =>
+                        u.UsuarioLogin == usuarioLogin &&
+                        u.BarbeariaId == barbeariaId.Value &&
+                        u.Id != usuario.Id);
+
+                if (loginExiste)
+                    ModelState.AddModelError("", "Este login já está sendo usado nesta barbearia.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.UsuarioBarbeiro = usuario;
+                return View(barbeiro);
+            }
+
             barbeiroBanco.Nome = barbeiro.Nome;
             barbeiroBanco.Telefone = barbeiro.Telefone;
             barbeiroBanco.Especialidade = barbeiro.Especialidade;
@@ -168,14 +204,16 @@ namespace BarbeariaFeuRosa.Controllers
             if (foto != null && foto.Length > 0)
                 barbeiroBanco.FotoUrl = SalvarFoto(foto);
 
-            var usuario = _context.Usuarios
-                .FirstOrDefault(u =>
-                    u.BarbeiroId == barbeiroBanco.Id &&
-                    u.BarbeariaId == barbeariaId.Value &&
-                    u.Tipo == "BARBEIRO");
-
             if (usuario != null)
+            {
                 usuario.Nome = barbeiroBanco.Nome;
+
+                if (!string.IsNullOrWhiteSpace(usuarioLogin))
+                    usuario.UsuarioLogin = usuarioLogin.Trim();
+
+                if (!string.IsNullOrWhiteSpace(novaSenha))
+                    usuario.Senha = novaSenha;
+            }
 
             _context.SaveChanges();
 
