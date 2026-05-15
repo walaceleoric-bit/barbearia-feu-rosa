@@ -114,8 +114,16 @@ namespace BarbeariaFeuRosa.Controllers
             ViewBag.Imagem5 = config?.CarrosselImagem5;
 
 
+            // RANKING MENSAL (reinicia automaticamente todo dia 01)
+            var primeiroDiaMes = new DateTime(
+                DateTime.UtcNow.Year,
+                DateTime.UtcNow.Month,
+                1);
+
             var ranking = _context.AvaliacoesBarbeiros
-                .Where(a => a.BarbeariaId == barbeariaId)
+                .Where(a =>
+                    a.BarbeariaId == barbeariaId &&
+                    a.DataAvaliacao >= primeiroDiaMes)
                 .GroupBy(a => new
                 {
                     a.BarbeiroId,
