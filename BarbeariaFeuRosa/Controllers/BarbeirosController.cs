@@ -145,7 +145,8 @@ namespace BarbeariaFeuRosa.Controllers
             Barbeiro barbeiro,
             IFormFile? foto,
             string usuarioLogin,
-            string novaSenha)
+            string novaSenha,
+            string statusAtivo)
         {
             var barbeariaId = ObterBarbeariaId();
 
@@ -199,7 +200,7 @@ namespace BarbeariaFeuRosa.Controllers
             barbeiroBanco.Telefone = barbeiro.Telefone;
             barbeiroBanco.Especialidade = barbeiro.Especialidade;
             barbeiroBanco.ComissaoPercentual = barbeiro.ComissaoPercentual;
-            barbeiroBanco.Ativo = barbeiro.Ativo;
+            barbeiroBanco.Ativo = statusAtivo == "true";
 
             if (foto != null && foto.Length > 0)
                 barbeiroBanco.FotoUrl = SalvarFoto(foto);

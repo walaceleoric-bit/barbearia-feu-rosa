@@ -37,7 +37,10 @@
 
         <div class="mb-3">
             <label>Trocar Foto</label>
-            <input type="file" name="foto" class="form-control" accept="image/*" />
+            <input type="file"
+                   name="foto"
+                   class="form-control"
+                   accept="image/*" />
         </div>
 
         <div class="mb-3">
@@ -47,17 +50,21 @@
 
         <div class="mb-3">
             <label>Telefone / WhatsApp</label>
-            <input asp-for="Telefone" class="form-control" placeholder="Ex: 27999999999" />
+            <input asp-for="Telefone"
+                   class="form-control"
+                   placeholder="Ex: 27999999999" />
         </div>
 
         <div class="mb-3">
             <label>Especialidade</label>
-            <input asp-for="Especialidade" class="form-control" />
+            <input asp-for="Especialidade"
+                   class="form-control" />
         </div>
 
         <div class="mb-3">
             <label>Comissão %</label>
-            <input asp-for="ComissaoPercentual" class="form-control" />
+            <input asp-for="ComissaoPercentual"
+                   class="form-control" />
         </div>
 
         <hr />
@@ -68,6 +75,7 @@
 
         <div class="mb-3">
             <label>Login do Barbeiro</label>
+
             <input name="usuarioLogin"
                    class="form-control"
                    value="@usuarioBarbeiro?.UsuarioLogin"
@@ -76,6 +84,7 @@
 
         <div class="mb-3">
             <label>Nova senha do Barbeiro</label>
+
             <input name="novaSenha"
                    class="form-control"
                    maxlength="6"
@@ -86,43 +95,52 @@
             </small>
         </div>
 
+
         <div class="mb-3">
 
-    <label>Status do Barbeiro</label>
+            <label>Status do Barbeiro</label>
 
-    <select name="Ativo" class="form-control">
+            <select name="statusAtivo"
+                    class="form-control">
 
-        @if (Model.Ativo)
-        {
-            <option value="true" selected>
-                ✅ Ativo
-            </option>
+                @if (Model.Ativo)
+                {
+                    <option value="true" selected>
+                        ✅ Ativo
+                    </option>
 
-            <option value="false">
-                ❌ Inativo
-            </option>
-        }
-        else
-        {
-            <option value="true">
-                ✅ Ativo
-            </option>
+                    <option value="false">
+                        ❌ Inativo
+                    </option>
+                }
+                else
+                {
+                    <option value="true">
+                        ✅ Ativo
+                    </option>
 
-            <option value="false" selected>
-                ❌ Inativo
-            </option>
-        }
+                    <option value="false" selected>
+                        ❌ Inativo
+                    </option>
+                }
 
-    </select>
+            </select>
 
-</div>
+        </div>
 
-        <button type="submit" class="btn btn-dark">
+
+        <button type="submit"
+                class="btn btn-dark">
+
             Salvar Alterações
+
         </button>
 
-        <a href="/Barbeiros" class="btn btn-secondary">
+        <a href="/Barbeiros"
+           class="btn btn-secondary">
+
             Cancelar
+
         </a>
 
     </form>
