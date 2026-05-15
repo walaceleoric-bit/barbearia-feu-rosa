@@ -33,8 +33,8 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Login", "Auth");
 
             var barbeiros = _context.Barbeiros
-                .Where(b => b.BarbeariaId == barbeariaId.Value)
-                .OrderBy(b => b.Nome)
+                .Where(x => x.BarbeariaId == barbeariaId.Value)
+                .OrderBy(x => x.Nome)
                 .ToList();
 
             return View(barbeiros);
@@ -42,104 +42,9 @@ namespace BarbeariaFeuRosa.Controllers
 
         public IActionResult Novo()
         {
-            var barbeariaId = ObterBarbeariaId();
-
-            if (barbeariaId == null)
-                return RedirectToAction("Login", "Auth");
-
             return View();
         }
 
-        [HttpPost]
-        public IActionResult Novo(
-            Barbeiro barbeiro,
-            IFormFile? foto,
-            string usuarioLogin,
-            string senha)
-        {
-            var barbeariaId = ObterBarbeariaId();
-
-            if (barbeariaId == null)
-                return RedirectToAction("Login", "Auth");
-
-            barbeiro.BarbeariaId = barbeariaId.Value;
-            barbeiro.Ativo = true;
-
-            ModelState.Remove("Barbearia");
-            ModelState.Remove("BarbeariaId");
-
-            if (string.IsNullOrWhiteSpace(usuarioLogin))
-                ModelState.AddModelError("", "Informe o usuário de login do barbeiro.");
-
-            if (string.IsNullOrWhiteSpace(senha))
-                ModelState.AddModelError("", "Informe a senha do barbeiro.");
-
-            if (!string.IsNullOrWhiteSpace(senha) && senha.Length > 6)
-                ModelState.AddModelError("", "A senha deve ter no máximo 6 caracteres.");
-
-            bool usuarioJaExiste = _context.Usuarios
-                .Any(u =>
-                    u.UsuarioLogin == usuarioLogin &&
-                    u.BarbeariaId == barbeariaId.Value);
-
-            if (usuarioJaExiste)
-                ModelState.AddModelError("", "Este usuário de login já existe nesta barbearia.");
-
-            if (!ModelState.IsValid)
-                return View(barbeiro);
-
-            if (foto != null && foto.Length > 0)
-                barbeiro.FotoUrl = SalvarFoto(foto);
-
-            _context.Barbeiros.Add(barbeiro);
-            _context.SaveChanges();
-
-            var usuario = new Usuario
-            {
-                Nome = barbeiro.Nome,
-                UsuarioLogin = usuarioLogin,
-                Senha = senha,
-                Tipo = "BARBEIRO",
-                BarbeariaId = barbeariaId.Value,
-                BarbeiroId = barbeiro.Id
-            };
-
-            _context.Usuarios.Add(usuario);
-            _context.SaveChanges();
-
-            TempData["Sucesso"] = "Barbeiro e login criados com sucesso!";
-
-            return RedirectToAction("Index");
-        }
-
-        public IActionResult Editar(int id)
-        {
-            var barbeariaId = ObterBarbeariaId();
-
-            if (barbeariaId == null)
-                return RedirectToAction("Login", "Auth");
-
-            var barbeiro = _context.Barbeiros
-                .FirstOrDefault(b =>
-                    b.Id == id &&
-                    b.BarbeariaId == barbeariaId.Value);
-
-            if (barbeiro == null)
-            {
-                TempData["Erro"] = "Barbeiro não encontrado.";
-                return RedirectToAction("Index");
-            }
-
-            var usuarioBarbeiro = _context.Usuarios
-                .FirstOrDefault(u =>
-                    u.BarbeiroId == barbeiro.Id &&
-                    u.BarbeariaId == barbeariaId.Value &&
-                    u.Tipo == "BARBEIRO");
-
-            ViewBag.UsuarioBarbeiro = usuarioBarbeiro;
-
-            return View(barbeiro);
-        }
 
         [HttpPost]
         public IActionResult Editar(
@@ -154,13 +59,11 @@ namespace BarbeariaFeuRosa.Controllers
             if (barbeariaId == null)
                 return RedirectToAction("Login", "Auth");
 
-            ModelState.Remove("Barbearia");
-            ModelState.Remove("BarbeariaId");
 
             var barbeiroBanco = _context.Barbeiros
-                .FirstOrDefault(b =>
-                    b.Id == barbeiro.Id &&
-                    b.BarbeariaId == barbeariaId.Value);
+                .FirstOrDefault(x =>
+                    x.Id == barbeiro.Id &&
+                    x.BarbeariaId == barbeariaId.Value);
 
             if (barbeiroBanco == null)
             {
@@ -168,75 +71,133 @@ namespace BarbeariaFeuRosa.Controllers
                 return RedirectToAction("Index");
             }
 
+
             var usuario = _context.Usuarios
-                .FirstOrDefault(u =>
-                    u.BarbeiroId == barbeiroBanco.Id &&
-                    u.BarbeariaId == barbeariaId.Value &&
-                    u.Tipo == "BARBEIRO");
+                .FirstOrDefault(x =>
+                    x.BarbeiroId == barbeiroBanco.Id &&
+                    x.BarbeariaId == barbeariaId.Value &&
+                    x.Tipo == "BARBEIRO");
 
-            if (!string.IsNullOrWhiteSpace(novaSenha) && novaSenha.Length > 6)
-                ModelState.AddModelError("", "A nova senha deve ter no máximo 6 caracteres.");
 
-            if (usuario != null && !string.IsNullOrWhiteSpace(usuarioLogin))
+            ModelState.Clear();
+
+
+            if (!string.IsNullOrWhiteSpace(novaSenha)
+                && novaSenha.Length > 6)
             {
-                usuarioLogin = usuarioLogin.Trim();
+                TempData["Erro"] =
+                    "A senha deve ter no máximo 6 caracteres.";
 
-                bool loginExiste = _context.Usuarios
-                    .Any(u =>
-                        u.UsuarioLogin == usuarioLogin &&
-                        u.BarbeariaId == barbeariaId.Value &&
-                        u.Id != usuario.Id);
-
-                if (loginExiste)
-                    ModelState.AddModelError("", "Este login já está sendo usado nesta barbearia.");
-            }
-
-            ModelState.Remove("ComissaoPercentual");
-
-            if (!ModelState.IsValid)
-            {
                 ViewBag.UsuarioBarbeiro = usuario;
+
                 return View(barbeiro);
             }
+
+
+            var textoComissao =
+                Request.Form["ComissaoPercentual"]
+                .ToString();
+
+            if (!decimal.TryParse(
+                    textoComissao.Replace(",", "."),
+                    NumberStyles.Any,
+                    CultureInfo.InvariantCulture,
+                    out var comissao))
+            {
+                TempData["Erro"] =
+                    "Comissão inválida.";
+
+                ViewBag.UsuarioBarbeiro = usuario;
+
+                return View(barbeiro);
+            }
+
+
 
             barbeiroBanco.Nome = barbeiro.Nome;
             barbeiroBanco.Telefone = barbeiro.Telefone;
-            barbeiroBanco.Especialidade = barbeiro.Especialidade;
-            var comissaoTexto = Request.Form["ComissaoPercentual"].ToString();
+            barbeiroBanco.Especialidade =
+                barbeiro.Especialidade;
 
-            if (!decimal.TryParse(
-                    comissaoTexto.Replace(",", "."),
-                    NumberStyles.Any,
-                    CultureInfo.InvariantCulture,
-                    out var comissaoConvertida))
-            {
-                ModelState.AddModelError("", "Informe uma comissão válida. Exemplo: 40,00 ou 40.00");
-                ViewBag.UsuarioBarbeiro = usuario;
-                return View(barbeiro);
-            }
+            barbeiroBanco.ComissaoPercentual =
+                comissao;
 
-            barbeiroBanco.ComissaoPercentual = comissaoConvertida;
-            barbeiroBanco.Ativo = statusAtivo == "true";
+            barbeiroBanco.Ativo =
+                statusAtivo == "true";
+
 
             if (foto != null && foto.Length > 0)
-                barbeiroBanco.FotoUrl = SalvarFoto(foto);
+            {
+                barbeiroBanco.FotoUrl =
+                    SalvarFoto(foto);
+            }
+
+
 
             if (usuario != null)
             {
-                usuario.Nome = barbeiroBanco.Nome;
+                usuario.Nome =
+                    barbeiroBanco.Nome;
 
-                if (!string.IsNullOrWhiteSpace(usuarioLogin))
-                    usuario.UsuarioLogin = usuarioLogin.Trim();
 
-                if (!string.IsNullOrWhiteSpace(novaSenha))
-                    usuario.Senha = novaSenha;
+                if (!string.IsNullOrWhiteSpace(
+                    usuarioLogin))
+                {
+                    usuario.UsuarioLogin =
+                        usuarioLogin.Trim();
+                }
+
+
+                if (!string.IsNullOrWhiteSpace(
+                    novaSenha))
+                {
+                    usuario.Senha =
+                        novaSenha.Trim();
+                }
             }
+
+
 
             _context.SaveChanges();
 
-            TempData["Sucesso"] = "Barbeiro atualizado com sucesso!";
+            TempData["Sucesso"] =
+                "Barbeiro atualizado com sucesso!";
+
             return RedirectToAction("Index");
         }
+
+
+
+        public IActionResult Editar(int id)
+        {
+            var barbeariaId = ObterBarbeariaId();
+
+            if (barbeariaId == null)
+                return RedirectToAction("Login", "Auth");
+
+
+            var barbeiro = _context.Barbeiros
+                .FirstOrDefault(x =>
+                    x.Id == id &&
+                    x.BarbeariaId == barbeariaId.Value);
+
+            if (barbeiro == null)
+                return RedirectToAction("Index");
+
+
+            var usuario = _context.Usuarios
+                .FirstOrDefault(x =>
+                    x.BarbeiroId == barbeiro.Id &&
+                    x.BarbeariaId == barbeariaId.Value &&
+                    x.Tipo == "BARBEIRO");
+
+
+            ViewBag.UsuarioBarbeiro = usuario;
+
+            return View(barbeiro);
+        }
+
+
 
         public IActionResult Excluir(int id)
         {
@@ -245,54 +206,79 @@ namespace BarbeariaFeuRosa.Controllers
             if (barbeariaId == null)
                 return RedirectToAction("Login", "Auth");
 
+
             var barbeiro = _context.Barbeiros
-                .FirstOrDefault(b =>
-                    b.Id == id &&
-                    b.BarbeariaId == barbeariaId.Value);
+                .FirstOrDefault(x =>
+                    x.Id == id &&
+                    x.BarbeariaId == barbeariaId.Value);
 
             if (barbeiro != null)
             {
                 var usuario = _context.Usuarios
-                    .FirstOrDefault(u =>
-                        u.BarbeiroId == barbeiro.Id &&
-                        u.BarbeariaId == barbeariaId.Value);
+                    .FirstOrDefault(x =>
+                        x.BarbeiroId == barbeiro.Id);
 
                 if (usuario != null)
                     _context.Usuarios.Remove(usuario);
 
                 _context.Barbeiros.Remove(barbeiro);
-                _context.SaveChanges();
 
-                TempData["Sucesso"] = "Barbeiro excluído com sucesso!";
+                _context.SaveChanges();
             }
-            else
-            {
-                TempData["Erro"] = "Barbeiro não encontrado.";
-            }
+
 
             return RedirectToAction("Index");
         }
 
-        private string SalvarFoto(IFormFile arquivo)
+
+
+        private string SalvarFoto(
+            IFormFile arquivo)
         {
-            var cloudName = _configuration["Cloudinary:CloudName"];
-            var apiKey = _configuration["Cloudinary:ApiKey"];
-            var apiSecret = _configuration["Cloudinary:ApiSecret"];
+            var cloudName =
+                _configuration["Cloudinary:CloudName"];
 
-            var account = new Account(cloudName, apiKey, apiSecret);
-            var cloudinary = new Cloudinary(account);
+            var apiKey =
+                _configuration["Cloudinary:ApiKey"];
 
-            using var stream = arquivo.OpenReadStream();
+            var apiSecret =
+                _configuration["Cloudinary:ApiSecret"];
 
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(arquivo.FileName, stream),
-                Folder = "barbearia-feu-rosa/barbeiros"
-            };
 
-            var uploadResult = cloudinary.Upload(uploadParams);
+            var account =
+                new Account(
+                    cloudName,
+                    apiKey,
+                    apiSecret);
 
-            return uploadResult.SecureUrl.ToString();
+            var cloudinary =
+                new Cloudinary(account);
+
+
+            using var stream =
+                arquivo.OpenReadStream();
+
+
+            var uploadParams =
+                new ImageUploadParams
+                {
+                    File = new FileDescription(
+                        arquivo.FileName,
+                        stream),
+
+                    Folder =
+                        "barbearia-feu-rosa/barbeiros"
+                };
+
+
+            var uploadResult =
+                cloudinary.Upload(
+                    uploadParams);
+
+
+            return uploadResult
+                .SecureUrl
+                .ToString();
         }
     }
 }
