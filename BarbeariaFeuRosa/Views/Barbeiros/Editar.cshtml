@@ -86,20 +86,34 @@
             </small>
         </div>
 
-        <div class="form-check mb-3">
+        <div class="mb-3">
 
-    <input type="hidden" name="Ativo" value="false" />
+    <label>Status do Barbeiro</label>
 
-    <input type="checkbox"
-           name="Ativo"
-           value="true"
-           class="form-check-input"
-           id="Ativo"
-           @(Model.Ativo ? "checked" : "") />
+    <select name="Ativo" class="form-control">
 
-    <label class="form-check-label" for="Ativo">
-        Barbeiro ativo
-    </label>
+        @if (Model.Ativo)
+        {
+            <option value="true" selected>
+                ✅ Ativo
+            </option>
+
+            <option value="false">
+                ❌ Inativo
+            </option>
+        }
+        else
+        {
+            <option value="true">
+                ✅ Ativo
+            </option>
+
+            <option value="false" selected>
+                ❌ Inativo
+            </option>
+        }
+
+    </select>
 
 </div>
 
