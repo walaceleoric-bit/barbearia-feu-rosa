@@ -114,7 +114,8 @@ namespace BarbeariaFeuRosa.Controllers
             ViewBag.Imagem5 = config?.CarrosselImagem5;
 
 
-            // RANKING MENSAL (reinicia automaticamente todo dia 01)
+            // Ranking mensal do cliente.
+            // Reinicia automaticamente todo dia 01 sem apagar histórico do banco.
             var primeiroDiaMes = new DateTime(
                 DateTime.UtcNow.Year,
                 DateTime.UtcNow.Month,
@@ -127,8 +128,14 @@ namespace BarbeariaFeuRosa.Controllers
                 .GroupBy(a => new
                 {
                     a.BarbeiroId,
-                    a.Barbeiro!.Nome,
-                    a.Barbeiro.FotoUrl
+
+                    Nome = a.Barbeiro != null
+                        ? a.Barbeiro.Nome
+                        : "Barbeiro",
+
+                    FotoUrl = a.Barbeiro != null
+                        ? a.Barbeiro.FotoUrl
+                        : null
                 })
                 .Select(g => new
                 {
