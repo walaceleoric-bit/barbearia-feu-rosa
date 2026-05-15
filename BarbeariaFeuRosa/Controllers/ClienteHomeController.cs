@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using BarbeariaFeuRosa.Data;
 
 namespace BarbeariaFeuRosa.Controllers
@@ -33,9 +34,7 @@ namespace BarbeariaFeuRosa.Controllers
                 HttpContext.Session.GetString("UsuarioNome");
 
             ViewBag.Servicos = _context.Servicos
-                .Where(s =>
-                    s.BarbeariaId == barbeariaId.Value &&
-                    s.Ativo)
+                .Where(s => s.BarbeariaId == barbeariaId.Value && s.Ativo)
                 .OrderBy(s => s.Nome)
                 .ToList();
 
@@ -57,9 +56,7 @@ namespace BarbeariaFeuRosa.Controllers
             CarregarTelaCliente(barbeariaId.Value);
 
             ViewBag.Barbeiros = _context.Barbeiros
-                .Where(b =>
-                    b.BarbeariaId == barbeariaId.Value &&
-                    b.Ativo)
+                .Where(b => b.BarbeariaId == barbeariaId.Value && b.Ativo)
                 .OrderBy(b => b.Nome)
                 .ToList();
 
@@ -82,9 +79,7 @@ namespace BarbeariaFeuRosa.Controllers
             CarregarTelaCliente(barbeariaId.Value);
 
             ViewBag.Servicos = _context.Servicos
-                .Where(s =>
-                    s.BarbeariaId == barbeariaId.Value &&
-                    s.Ativo)
+                .Where(s => s.BarbeariaId == barbeariaId.Value && s.Ativo)
                 .OrderBy(s => s.Nome)
                 .ToList();
 
@@ -113,29 +108,30 @@ namespace BarbeariaFeuRosa.Controllers
             ViewBag.Imagem4 = config?.CarrosselImagem4;
             ViewBag.Imagem5 = config?.CarrosselImagem5;
 
-
-            // Ranking mensal do cliente.
-            // Reinicia automaticamente todo dia 01 sem apagar histórico do banco.
             var primeiroDiaMes = new DateTime(
                 DateTime.UtcNow.Year,
                 DateTime.UtcNow.Month,
-                1);
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc
+            );
 
-            var ranking = _context.AvaliacoesBarbeiros
+            var avaliacoesDoMes = _context.AvaliacoesBarbeiros
+                .Include(a => a.Barbeiro)
                 .Where(a =>
                     a.BarbeariaId == barbeariaId &&
-                    a.DataAvaliacao >= primeiroDiaMes)
+                    a.DataAvaliacao >= primeiroDiaMes &&
+                    a.Barbeiro != null)
+                .ToList();
+
+            var ranking = avaliacoesDoMes
                 .GroupBy(a => new
                 {
                     a.BarbeiroId,
-
-                    Nome = a.Barbeiro != null
-                        ? a.Barbeiro.Nome
-                        : "Barbeiro",
-
-                    FotoUrl = a.Barbeiro != null
-                        ? a.Barbeiro.FotoUrl
-                        : null
+                    Nome = a.Barbeiro?.Nome ?? "Barbeiro",
+                    FotoUrl = a.Barbeiro?.FotoUrl
                 })
                 .Select(g => new
                 {
