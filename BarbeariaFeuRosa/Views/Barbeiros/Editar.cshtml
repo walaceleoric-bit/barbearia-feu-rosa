@@ -87,11 +87,21 @@
         </div>
 
         <div class="form-check mb-3">
-            <input asp-for="Ativo" class="form-check-input" />
-            <label class="form-check-label" asp-for="Ativo">
-                Barbeiro ativo
-            </label>
-        </div>
+
+    <input type="hidden" name="Ativo" value="false" />
+
+    <input type="checkbox"
+           name="Ativo"
+           value="true"
+           class="form-check-input"
+           id="Ativo"
+           @(Model.Ativo ? "checked" : "") />
+
+    <label class="form-check-label" for="Ativo">
+        Barbeiro ativo
+    </label>
+
+</div>
 
         <button type="submit" class="btn btn-dark">
             Salvar Alterações
