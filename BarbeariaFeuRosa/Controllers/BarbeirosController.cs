@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using BarbeariaFeuRosa.Models;
 using BarbeariaFeuRosa.Data;
 using CloudinaryDotNet;
@@ -190,6 +191,8 @@ namespace BarbeariaFeuRosa.Controllers
                     ModelState.AddModelError("", "Este login já está sendo usado nesta barbearia.");
             }
 
+            ModelState.Remove("ComissaoPercentual");
+
             if (!ModelState.IsValid)
             {
                 ViewBag.UsuarioBarbeiro = usuario;
@@ -199,7 +202,20 @@ namespace BarbeariaFeuRosa.Controllers
             barbeiroBanco.Nome = barbeiro.Nome;
             barbeiroBanco.Telefone = barbeiro.Telefone;
             barbeiroBanco.Especialidade = barbeiro.Especialidade;
-            barbeiroBanco.ComissaoPercentual = barbeiro.ComissaoPercentual;
+            var comissaoTexto = Request.Form["ComissaoPercentual"].ToString();
+
+            if (!decimal.TryParse(
+                    comissaoTexto.Replace(",", "."),
+                    NumberStyles.Any,
+                    CultureInfo.InvariantCulture,
+                    out var comissaoConvertida))
+            {
+                ModelState.AddModelError("", "Informe uma comissão válida. Exemplo: 40,00 ou 40.00");
+                ViewBag.UsuarioBarbeiro = usuario;
+                return View(barbeiro);
+            }
+
+            barbeiroBanco.ComissaoPercentual = comissaoConvertida;
             barbeiroBanco.Ativo = statusAtivo == "true";
 
             if (foto != null && foto.Length > 0)
